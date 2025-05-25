@@ -38,10 +38,45 @@ let isLoggedIn = false;
 
 // Function to update keytrend button state
 function updateKeytrendButtonState() {
-  const keytrendButton = document.querySelector('#keytrend-card .feature-button');
-  if (keytrendButton) {
-    keytrendButton.disabled = !isLoggedIn;
-  }
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const lockedFeatures = [
+    'price',
+    'viral',
+    'name',
+    'tag',
+    'chord',
+    'melody',
+    'drum-pattern',
+    'contract',
+    'posttime',
+    'visualizer',
+    'trending-sound',
+    'beat-performance',
+    'release-impact',
+    'collab-matcher',
+    'youtube-upload-assistant'
+  ];
+
+  lockedFeatures.forEach(featureId => {
+    const card = document.getElementById(`${featureId}-card`);
+    if (card) {
+      const button = card.querySelector('.feature-button');
+      const lockIcon = card.querySelector('.lock-icon');
+      const featureDescription = card.querySelector('.feature-description');
+      
+      if (button && lockIcon && featureDescription) {
+        if (isLoggedIn) {
+          button.disabled = false;
+          lockIcon.style.display = 'none';
+          featureDescription.style.display = 'none';
+        } else {
+          button.disabled = true;
+          lockIcon.style.display = 'inline-block';
+          featureDescription.style.display = 'block';
+        }
+      }
+    }
+  });
 }
 
 // Load plugin and studio data
@@ -4821,7 +4856,8 @@ async function signup() {
 async function login() {
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
-  
+  const messageElement = document.getElementById('login-message');
+
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: username,
@@ -4830,16 +4866,15 @@ async function login() {
 
     if (error) throw error;
 
-    isLoggedIn = true;
-    document.getElementById('login-modal').style.display = 'none';
+    localStorage.setItem('isLoggedIn', 'true');
+    messageElement.textContent = 'Login successful!';
+    messageElement.style.color = '#00ff00';
+    closeLoginModal();
     updateLoginButton();
-    updateKeytrendButtonState(); // Add this line to update button state after login
-    
-    // Clear login form
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
+    updateKeytrendButtonState(); // Update locked features state
   } catch (error) {
-    document.getElementById('login-message').textContent = error.message;
+    messageElement.textContent = error.message;
+    messageElement.style.color = '#ff0000';
   }
 }
 
@@ -4847,10 +4882,10 @@ async function logout() {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-    
-    isLoggedIn = false;
+
+    localStorage.setItem('isLoggedIn', 'false');
     updateLoginButton();
-    updateKeytrendButtonState(); // Add this line to update button state after logout
+    updateKeytrendButtonState(); // Update locked features state
   } catch (error) {
     console.error('Error logging out:', error.message);
   }
@@ -4874,5 +4909,15 @@ function loginWithProvider(provider) {
 }
 
 // Listen for auth state changes
-supabase.auth.onAuthStateChange(updateLoginButton);
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN') {
+    localStorage.setItem('isLoggedIn', 'true');
+    updateLoginButton();
+    updateKeytrendButtonState();
+  } else if (event === 'SIGNED_OUT') {
+    localStorage.setItem('isLoggedIn', 'false');
+    updateLoginButton();
+    updateKeytrendButtonState();
+  }
+});
 // ... rest of the existing code ...
