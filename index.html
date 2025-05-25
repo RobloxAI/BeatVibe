@@ -27,7 +27,8 @@
         <span class="recommended-badge">✅ Recommended</span>
         <h2>Trending Keyword Finder</h2>
         <p>Find viral keywords.</p>
-        <button class="feature-button">Open</button>
+        <button class="feature-button" disabled>Open</button>
+        <span class="lock-icon">🔒</span>
         <span class="save-star" onclick="toggleSaveFeature('keytrend')">★</span>
       </div>
       <div class="card neon-border" id="bpm-tapper-card">
@@ -293,6 +294,10 @@
       <h3>Brightness</h3>
       <input type="range" class="brightness-control" min="0" max="100" value="90" oninput="adjustBrightness(this.value)">
       <span class="brightness-value">90%</span>
+    </div>
+
+    <div class="settings-section version-info">
+      <p>Version 0.1</p>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

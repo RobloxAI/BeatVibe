@@ -9,6 +9,9 @@ function updateFeatureCounter() {
 // Call this function when the page loads
 document.addEventListener('DOMContentLoaded', updateFeatureCounter);
 
+// Add this to initialize keytrend button state on page load
+document.addEventListener('DOMContentLoaded', updateKeytrendButtonState);
+
 const modal = document.getElementById("modal");
 const modalBody = document.getElementById("modal-body");
 const closeBtn = document.querySelector(".close");
@@ -29,6 +32,17 @@ let brightness = localStorage.getItem('brightness') || 90;
 let currentDate = new Date();
 let currentMonth = currentDate.getMonth();
 let currentYear = currentDate.getFullYear();
+
+// Track login state
+let isLoggedIn = false;
+
+// Function to update keytrend button state
+function updateKeytrendButtonState() {
+  const keytrendButton = document.querySelector('#keytrend-card .feature-button');
+  if (keytrendButton) {
+    keytrendButton.disabled = !isLoggedIn;
+  }
+}
 
 // Load plugin and studio data
 let plugins = JSON.parse(localStorage.getItem('plugins')) || [];
@@ -4805,26 +4819,41 @@ async function signup() {
 }
 
 async function login() {
-  const email = document.getElementById('username').value;
+  const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
-  const messageElement = document.getElementById('login-message');
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    messageElement.textContent = error.message;
-    messageElement.style.color = '#ff4444';
-  } else {
-    messageElement.textContent = 'Login successful!';
-    messageElement.style.color = '#00ff00';
-    setTimeout(() => {
-      closeLoginModal();
-      updateLoginButton();
-    }, 1000);
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username,
+      password: password
+    });
+
+    if (error) throw error;
+
+    isLoggedIn = true;
+    document.getElementById('login-modal').style.display = 'none';
+    updateLoginButton();
+    updateKeytrendButtonState(); // Add this line to update button state after login
+    
+    // Clear login form
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+  } catch (error) {
+    document.getElementById('login-message').textContent = error.message;
   }
 }
 
 async function logout() {
-  await supabase.auth.signOut();
-  updateLoginButton();
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    
+    isLoggedIn = false;
+    updateLoginButton();
+    updateKeytrendButtonState(); // Add this line to update button state after logout
+  } catch (error) {
+    console.error('Error logging out:', error.message);
+  }
 }
 
 function updateLoginButton() {

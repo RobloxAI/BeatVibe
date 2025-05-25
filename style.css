@@ -117,6 +117,36 @@ body {
   transform: translateY(-2px);
 }
 
+.feature-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(145deg, #1c2440, #16213e);
+  color: #666;
+  border: 2px solid #666;
+  text-shadow: none;
+}
+
+.feature-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.lock-icon {
+  display: inline-block;
+  margin-left: 8px;
+  color: #666;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+.feature-button:disabled + .lock-icon {
+  color: #666;
+}
+
+.feature-button:not(:disabled) + .lock-icon {
+  display: none;
+}
+
 .dice-button {
   display: block;
   margin: 20px auto;
@@ -1067,8 +1097,24 @@ textarea {
 }
 
 .brightness-value {
-  color: #00ffff;
-  margin-left: 10px;
+  color: var(--primary, #00ffff);
+  font-family: monospace;
+  font-size: 1.1em;
+  text-shadow: 0 0 5px var(--primary, #00ffff);
+}
+
+.version-info {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.version-info p {
+  color: var(--primary, #00ffff);
+  font-size: 0.9em;
+  text-align: center;
+  opacity: 0.8;
+  text-shadow: 0 0 5px var(--primary, #00ffff);
 }
 
 /* Beat Shop Styles */
