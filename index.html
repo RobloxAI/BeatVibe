@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BeatVibe - Your Producer Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3734597308709750" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="stars left-stars"></div>
+  <div class="stars right-stars"></div>
+  <div class="nebula left-nebula"></div>
+  <div class="nebula right-nebula"></div>
+  <div class="container">
+    <button class="login-button" onclick="openLoginModal()">Login</button>
+    <h1 class="neon-text">BeatVibe</h1>
+    <p class="subtitle">Your ultimate producer toolkit.</p>
+    <p class="feature-counter" id="feature-counter"></p>
+    <p class="creator">Created by Thaker</p>
+    <input type="text" id="feature-search" placeholder="🔍 Search features..." onkeyup="searchFeatures()">
+
+    <div class="features" id="feature-grid">
+      <div class="card neon-border" id="plan-card"><h2>Plan</h2><p>Organize your beat ideas.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('plan')">★</span></div>
+      <div class="card neon-border" id="schedule-card"><h2>Schedule</h2><p>Set deadlines.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('schedule')">★</span></div>
+      <div class="card neon-border" id="keytrend-card">
+        <span class="recommended-badge">✅ Recommended</span>
+        <h2>Trending Keyword Finder</h2>
+        <p>Find viral keywords.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('keytrend')">★</span>
+      </div>
+      <div class="card neon-border" id="bpm-tapper-card">
+        <h2>BPM Tapper</h2>
+        <p>Tap to find the tempo of any beat or song.</p>
+        <button class="feature-button" onclick="openBpmTapper()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('bpm-tapper')">★</span>
+      </div>
+      <div class="card neon-border" id="sell-beats-card">
+        <h2>Sell Your Beats</h2>
+        <p>Get your beats featured in the Beat Shop!</p>
+        <button class="feature-button" onclick="openSellYourBeats()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('sell-beats')">★</span>
+      </div>
+      <div class="card neon-border" id="gearhub-card"><h2>Gear Hub</h2><p>Find the best production tools.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('gearhub')">★</span></div>
+      <div class="card neon-border" id="beatshop-card">
+        <span class="recommended-badge">🔥 Hot Deals</span>
+        <h2>Beat Shop</h2>
+        <p>Premium beats under $1!</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('beatshop')">★</span>
+      </div>
+      <div class="card neon-border" id="price-card"><h2>Price Your Beats</h2><p>Calculate prices.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('price')">★</span></div>
+      <div class="card neon-border" id="social-card"><h2>Social Media Planner</h2><p>Schedule posts.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('social')">★</span></div>
+      <div class="card neon-border" id="viral-card"><h2>Viral Score</h2><p>Rate virality.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('viral')">★</span></div>
+      <div class="card neon-border" id="progress-card"><h2>Progress Tracker</h2><p>Monitor goals.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('progress')">★</span></div>
+      <div class="card neon-border" id="name-card"><h2>Beat Name Generator</h2><p>Create titles.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('name')">★</span></div>
+      <div class="card neon-border" id="dice-card"><h2>Inspiration Dice</h2><p>Spark ideas.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('dice')">★</span></div>
+      <div class="card neon-border" id="gear-card"><h2>Gear Wishlist</h2><p>Track gear.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('gear')">★</span></div>
+      <div class="card neon-border" id="lyric-card"><h2>Freestyle Lyric Pad</h2><p>Jot rhymes.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('lyric')">★</span></div>
+      <div class="card neon-border" id="tag-card"><h2>Beat Tag Maker</h2><p>Generate tags.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('tag')">★</span></div>
+      <div class="card neon-border" id="loop-card"><h2>Loop/Sample Library</h2><p>Explore free sounds.</p><button class="feature-button">Open</button><span class="save-star" onclick="toggleSaveFeature('loop')">★</span></div>
+      
+      <div class="card neon-border" id="chord-card">
+        <span class="recommended-badge">🎹 New</span>
+        <h2>Chord Generator</h2>
+        <p>Create unique progressions.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('chord')">★</span>
+      </div>
+      
+      <div class="card neon-border" id="melody-card">
+        <h2>Melody Generator</h2>
+        <p>Generate catchy melodies.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('melody')">★</span>
+      </div>
+      
+      <div class="card neon-border" id="drum-pattern-card">
+        <h2>Drum Pattern Generator</h2>
+        <p>Create unique rhythms.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('drum-pattern')">★</span>
+      </div>
+      
+      <div class="card neon-border" id="audio-converter-card">
+        <h2>Audio Converter</h2>
+        <p>Convert between formats.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('audio-converter')">★</span>
+      </div>
+      
+      <div class="card neon-border" id="file-optimizer-card">
+        <h2>File Optimizer</h2>
+        <p>Optimize file sizes.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('file-optimizer')">★</span>
+      </div>
+      
+      <div class="card neon-border" id="reference-card">
+        <h2>Reference Matcher</h2>
+        <p>Match track qualities for type beats and more!</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('reference')">★</span>
+      </div>
+
+      <div class="card neon-border" id="contract-card">
+        <span class="recommended-badge">📄 New</span>
+        <h2>Contract Generator</h2>
+        <p>Create professional beat licenses.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('contract')">★</span>
+      </div>
+
+      <div class="card neon-border" id="posttime-card">
+        <h2>Best Post Time</h2>
+        <p>Find optimal posting times.</p>
+        <button class="feature-button">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('posttime')">★</span>
+      </div>
+
+      <div class="card neon-border" id="sample-organizer-card">
+        <h2>Sample Organizer</h2>
+        <p>Organize and tag your samples.</p>
+        <button class="feature-button" onclick="openSampleOrganizer()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('sample-organizer')">★</span>
+      </div>
+
+      <div class="card neon-border" id="plugin-manager-card">
+        <h2>Plugin Manager</h2>
+        <p>Track and organize your plugins.</p>
+        <button class="feature-button" onclick="openPluginManager()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('plugin-manager')">★</span>
+      </div>
+
+      <div class="card neon-border" id="studio-planner-card">
+        <h2>Studio Setup Planner</h2>
+        <p>Plan your perfect studio setup.</p>
+        <button class="feature-button" onclick="openStudioPlanner()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('studio-planner')">★</span>
+      </div>
+
+      <div class="card neon-border" id="visualizer-card">
+        <h2>Beat Video Visualizer</h2>
+        <p>Generate engaging beat videos.</p>
+        <button class="feature-button" onclick="openBeatVisualizer()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('visualizer')">★</span>
+      </div>
+
+      <div class="card neon-border" id="theory-flashcards-card">
+        <span class="maintenance-badge">Under Maintenance</span>
+        <h2>Music Theory Flashcards</h2>
+        <p>Learn music theory with interactive flashcards.</p>
+        <button class="feature-button" onclick="openTheoryFlashcards()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('theory-flashcards')">★</span>
+      </div>
+
+      <div class="card neon-border" id="daw-shortcuts-card">
+        <h2>DAW Shortcut Guide</h2>
+        <p>Master your DAW shortcuts.</p>
+        <button class="feature-button" onclick="openDAWShortcuts()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('daw-shortcuts')">★</span>
+      </div>
+
+      <div class="card neon-border" id="plugin-tutorials-card">
+        <h2>Mixing Tutorial Library</h2>
+        <p>Learn mixing and mastering techniques.</p>
+        <button class="feature-button" onclick="openPluginTutorials()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('plugin-tutorials')">★</span>
+      </div>
+
+      <div class="card neon-border" id="producer-dictionary-card">
+        <h2>Producer Dictionary</h2>
+        <p>Learn music production terms.</p>
+        <button class="feature-button" onclick="openProducerDictionary()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('producer-dictionary')">★</span>
+      </div>
+
+      <div class="card neon-border" id="trending-sound-card">
+        <h2>Trending Sound Analyzer</h2>
+        <p>Analyze trending sounds on social media.</p>
+        <button class="feature-button" onclick="analyzeTrendingSound()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('trending-sound')">★</span>
+      </div>
+
+      <div class="card neon-border" id="beat-performance-card">
+        <h2>Beat Performance Tracker</h2>
+        <p>Track and analyze your beat's performance metrics.</p>
+        <button class="feature-button" onclick="openBeatPerformance()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('beat-performance')">★</span>
+      </div>
+
+      <div class="card neon-border" id="release-impact-card">
+        <h2>Release Impact Analyzer</h2>
+        <p>Analyze the potential impact of your music release.</p>
+        <button class="feature-button" onclick="openReleaseImpact()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('release-impact')">★</span>
+      </div>
+
+      <div class="card neon-border" id="collab-matcher-card">
+        <span class="maintenance-badge">Under Maintenance</span>
+        <h2>Collaboration Matcher</h2>
+        <p>Find perfect collaborators for your projects.</p>
+        <button class="feature-button" onclick="openCollabMatcher()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('collab-matcher')">★</span>
+      </div>
+
+      <div class="card neon-border" id="youtube-upload-assistant-card">
+        <span class="recommended-badge">New</span>
+        <h2>YouTube Upload Assistant</h2>
+        <p>Generate titles, descriptions, tags, and a checklist for uploading your beats to YouTube.</p>
+        <button class="feature-button" onclick="openYouTubeUploadAssistant()">Open</button>
+        <span class="save-star" onclick="toggleSaveFeature('youtube-upload-assistant')">★</span>
+      </div>
+    </div>
+
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">×</span>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <div id="login-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">×</span>
+        <div class="login-container">
+          <h2>Login / Sign Up</h2>
+          <div class="login-form">
+            <input type="text" id="username" placeholder="Email" class="login-input">
+            <input type="password" id="password" placeholder="Password" class="login-input">
+            <button onclick="login()" class="feature-button">Login</button>
+            <button onclick="signup()" class="feature-button">Sign Up</button>
+          </div>
+          <p id="login-message" class="login-message"></p>
+        </div>
+      </div>
+    </div>
+
+    <button class="sidebar-toggle" onclick="toggleSidebar()">★</button>
+    <div class="saved-features-sidebar" id="saved-features-sidebar">
+      <h2>⭐ Favorites</h2>
+      <div id="saved-features-list"></div>
+    </div>
+
+    <br><br>
+    <center>
+      <button class="feature-button feedback-btn" onclick="openFeedback()">Recommend a feature (feedback)</button>
+    </center>
+  </div>
+  <button class="settings-button" onclick="toggleSettings()">⚙️</button>
+  <div class="settings-panel" id="settings-panel">
+    <h2>Settings</h2>
+    
+    <div class="settings-section">
+      <h3>Color Theme</h3>
+      <div class="color-preset" onclick="setTheme('cyberpunk')">
+        <div class="color-preview" style="background: linear-gradient(45deg, #00ffff, #ff00ff)"></div>
+        <span>Cyberpunk Dreams</span>
+      </div>
+      <div class="color-preset" onclick="setTheme('inferno')">
+        <div class="color-preview" style="background: linear-gradient(45deg, #ff4d4d, #ff8c00)"></div>
+        <span>Inferno Fusion</span>
+      </div>
+      <div class="color-preset" onclick="setTheme('forest')">
+        <div class="color-preview" style="background: linear-gradient(45deg, #00ff9d, #006644)"></div>
+        <span>Mystic Forest</span>
+      </div>
+      <div class="color-preset" onclick="setTheme('ocean')">
+        <div class="color-preview" style="background: linear-gradient(45deg, #00ccff, #0066cc)"></div>
+        <span>Deep Ocean</span>
+      </div>
+      <div class="color-preset" onclick="setTheme('aurora')">
+        <div class="color-preview" style="background: linear-gradient(45deg, #ff66ff, #66ffcc)"></div>
+        <span>Aurora Lights</span>
+      </div>
+      <div class="color-preset" onclick="setTheme('sunset')">
+        <div class="color-preview" style="background: linear-gradient(45deg, #ff9966, #ff66cc)"></div>
+        <span>Sunset Vibes</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Display Mode</h3>
+      <div class="mode-select">
+        <button onclick="setMode('neon')" class="feature-button">Neon</button>
+        <button onclick="setMode('dark')" class="feature-button">Dark</button>
+        <button onclick="setMode('light')" class="feature-button">Light</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>Brightness</h3>
+      <input type="range" class="brightness-control" min="0" max="100" value="90" oninput="adjustBrightness(this.value)">
+      <span class="brightness-value">90%</span>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://uzrqmkmbdpibgejbwilt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6cnFta21iZHBpYmdlamJ3aWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4MDI0NjgsImV4cCI6MjA2MzM3ODQ2OH0.eHjzgwkrD0RJqP2_cA_p58Ls0bTLu6_UEEPtscvmuWc';
+    window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
