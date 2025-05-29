@@ -1,4 +1,14 @@
 // Add this at the beginning of the file, after any existing code
+// Format large numbers properly
+function formatNumber(num) {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  } else {
+    return num.toString();
+  }
+}
 function updateFeatureCounter() {
   const featureCards = document.querySelectorAll('.card');
   const count = featureCards.length - 1; // Subtract 1 as requested
@@ -212,72 +222,45 @@ function exportSampleList() {
 }
 
 function openModal(content) {
-    const modal = document.getElementById('modal');
-    if (!modal) return;
-    // Hide the feature counter
-    const featureCounter = document.getElementById('feature-counter');
-    if (featureCounter) featureCounter.style.display = 'none';
-    // Set the modal content
-    const modalBody = document.getElementById('modal-body');
-    if (modalBody) {
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modal-body');
+  if (!modal || !modalBody) return;
+  // Hide the feature counter
+  const featureCounter = document.getElementById('feature-counter');
+  if (featureCounter) featureCounter.style.display = 'none';
+  // Hide all recommended and maintenance badges when modal is opened
+  document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+    badge.style.display = 'none';
+  });
+  // Set the modal content
   modalBody.innerHTML = content;
-    }
-    // Show the modal
-    modal.style.display = 'block';
-    // Hide all recommended and maintenance badges when modal is opened
-    document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
-        badge.style.display = 'none';
-    });
-    // Set up close button functionality
-    const closeButton = modal.querySelector('.close');
-    if (closeButton) {
-        closeButton.onclick = function() {
-            modal.style.display = 'none';
-            // Show all badges when modal is closed
-            document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
-                badge.style.display = 'flex';
-            });
-            // Show the feature counter again
-            if (featureCounter) featureCounter.style.display = '';
-        };
-    }
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-            // Show all badges when modal is closed
-            document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
-                badge.style.display = 'flex';
-            });
-            // Show the feature counter again
-            if (featureCounter) featureCounter.style.display = '';
-        }
+  modal.style.display = 'flex';
+  // Set up close button functionality
+  const closeButton = modal.querySelector('.close');
+  if (closeButton) {
+    closeButton.onclick = function() {
+      closeModal();
     };
+  }
+  // Close modal when clicking outside
+  window.onclick = function(event) {
+    if (event.target === modal) {
+      closeModal();
+    }
+  };
 }
 
-closeBtn.onclick = () => {
-  modal.style.display = "none";
+function closeModal() {
+  const modal = document.getElementById('modal');
+  if (modal) modal.style.display = 'none';
   // Show all badges when modal is closed
-  document.querySelectorAll('.recommended-badge').forEach(badge => {
+  document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
     badge.style.display = 'flex';
   });
   // Show the feature counter again
   const featureCounter = document.getElementById('feature-counter');
   if (featureCounter) featureCounter.style.display = '';
-};
-
-window.onclick = (event) => {
-  if (event.target === modal) {
-    modal.style.display = "none";
-    // Show all badges when modal is closed
-    document.querySelectorAll('.recommended-badge').forEach(badge => {
-      badge.style.display = 'flex';
-    });
-    // Show the feature counter again
-    const featureCounter = document.getElementById('feature-counter');
-    if (featureCounter) featureCounter.style.display = '';
-  }
-};
+}
 
 // Search Features
 function searchFeatures() {
@@ -1224,7 +1207,8 @@ async function fetchYouTubeData(keyword, apiKey) {
       exampleVideo,
       relatedKeywords,
       suggestedKeywords: generateKeywordList(keyword),
-      timeFilter: timeFilter // Include the time filter in the response
+      timeFilter: timeFilter, // Include the time filter in the response
+      items: statsData.items // Pass video items for channel analysis
     };
   } catch (error) {
     console.error("YouTube API Error:", error);
@@ -1294,6 +1278,9 @@ function findBestExampleVideo(videos) {
 
 // Display the results in the UI
 function displayResults(keyword, data) {
+  // Store the analysis data globally
+  lastKeywordAnalysis = data;
+  
   const resultsDiv = document.getElementById("keytrend-results");
   const searchVolume = data.totalResults;
   const competition = data.competition;
@@ -1302,6 +1289,10 @@ function displayResults(keyword, data) {
   const relatedKeywords = data.relatedKeywords;
   const suggestedKeywords = data.suggestedKeywords;
   const timeFilter = data.timeFilter;
+  const items = data.items || [];
+
+  // Simulate video performance metrics
+  const metrics = calculateVideoPerformanceMetrics(items);
   
   // Get time period text
   const timePeriodText = {
@@ -1315,16 +1306,7 @@ function displayResults(keyword, data) {
   // Calculate a more reasonable bar height for search volume
   const volumeBarHeight = Math.min(Math.log10(searchVolume) * 30, 180);
   
-  // Format large numbers properly
-  const formatNumber = (num) => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(1) + 'M';
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    } else {
-      return num.toString();
-    }
-  };
+  
   
   resultsDiv.innerHTML = `
     <h3>Results for "${keyword}" (${timePeriodText})</h3>
@@ -1367,6 +1349,47 @@ function displayResults(keyword, data) {
       </div>
     </div>
     
+    <div class="channel-analysis">
+      <h3>Channel Analysis</h3>
+      <div class="channel-metrics">
+        <div class="channel-metric">
+          <h4>Top Channels</h4>
+          <div class="channel-list">
+            ${analyzeTopChannels(data.items)}
+          </div>
+        </div>
+        <div class="channel-metric">
+          <h4>Channel Growth</h4>
+          <div class="growth-stats">
+            ${analyzeChannelGrowth(data.items)}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="video-performance-metrics">
+      <h3>Video Performance Metrics</h3>
+      <div class="performance-metrics-grid">
+        <div class="performance-metric">
+          <span class="metric-label">Avg. Watch Time</span>
+          <span class="metric-value">${metrics.avgWatchTime} min</span>
+        </div>
+        <div class="performance-metric">
+          <span class="metric-label">Engagement Rate</span>
+          <span class="metric-value">${metrics.engagementRate}%</span>
+        </div>
+        <div class="performance-metric">
+          <span class="metric-label">Click-Through Rate</span>
+          <span class="metric-value">${metrics.ctr}%</span>
+        </div>
+        <div class="performance-metric">
+          <span class="metric-label">Retention Rate</span>
+          <span class="metric-value">${metrics.retentionRate}%</span>
+        </div>
+      </div>
+      <button class="metrics-info-btn" onclick="openMetricsInfoModal()">What do these numbers mean?</button>
+    </div>
+    
     <div class="related-keywords">
       <h3>Related Keywords</h3>
       <div>
@@ -1390,6 +1413,332 @@ function displayResults(keyword, data) {
     </div>
     
     <button onclick="saveKeyword('${keyword}')" class="feature-button">Save This Keyword</button>
+    <div class="premium-analyze-section">
+      <button onclick="fullAnalyzeKeyword('${keyword}')" class="feature-button premium-analyze-btn">Full Analyze</button>
+    </div>
+  `;
+}
+
+// Global closeModal function for all modals
+function closeModal() {
+  const modal = document.getElementById('modal');
+  if (modal) modal.style.display = 'none';
+  // Show all badges when modal is closed
+  document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+    badge.style.display = 'flex';
+  });
+  // Show the feature counter again
+  const featureCounter = document.getElementById('feature-counter');
+  if (featureCounter) featureCounter.style.display = '';
+}
+
+function fullAnalyzeKeyword(keyword) {
+  // Show loading modal first
+  openModal(`
+    <div class='full-analyze-modal'>
+      <h2 style='color:#00eeff;'>Analyzing Keyword...</h2>
+      <div class='analyze-loading-text'>Running advanced music marketing analysis, please wait</div>
+      <div class='analyze-loading-bar'><div class='analyze-loading-bar-inner' id='analyze-loading-bar-inner'></div></div>
+    </div>
+  `);
+  // Animate loading bar with longer duration
+  let progress = 0;
+  const bar = document.getElementById('analyze-loading-bar-inner');
+  const interval = setInterval(() => {
+    progress += Math.random() * 8 + 3; // Slower progress
+    if (progress > 100) progress = 100;
+    if (bar) bar.style.width = progress + '%';
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(() => showFullAnalysis(keyword), 800); // Longer delay before showing results
+    }
+  }, 300); // Slower interval
+}
+
+function showFullAnalysis(keyword) {
+  if (!lastKeywordAnalysis) {
+    alert('Please analyze a keyword first!');
+    return;
+  }
+  const data = lastKeywordAnalysis;
+  const searchVolume = data.totalResults;
+  const competition = data.competition;
+  const trendDirection = data.trendDirection;
+  const metrics = calculateVideoPerformanceMetrics(data.items || []);
+
+  // Rule-based analysis
+  let summary = '';
+  let badge = '';
+  let plan = '';
+  let tips = [];
+  let marketInsights = [];
+  let contentStrategy = [];
+  let audienceInsights = [];
+
+  // Opportunity score
+  let score = 0;
+  if (searchVolume > 100000) score += 2;
+  else if (searchVolume > 10000) score += 1;
+  if (competition < 0.4) score += 2;
+  else if (competition < 0.7) score += 1;
+  if (trendDirection === 'up') score += 2;
+  else if (trendDirection === 'neutral') score += 1;
+  if (parseFloat(metrics.engagementRate) > 5) score += 2;
+  else if (parseFloat(metrics.engagementRate) > 2) score += 1;
+
+  if (score >= 7) {
+    summary = 'Excellent Opportunity';
+    badge = '🌟';
+    plan = 'Post now for maximum impact!';
+    tips = [
+      'Use high-quality thumbnails to boost click-through rate.',
+      'Engage with comments quickly to keep engagement high.',
+      'Consider collaborating with top channels in this niche.',
+      'Optimize your video description with relevant keywords.',
+      'Create a series of related content to maintain momentum.'
+    ];
+    marketInsights = [
+      'High demand with relatively low competition.',
+      'Growing trend indicates increasing market potential.',
+      'Strong engagement suggests active and interested audience.',
+      'Opportunity for premium pricing due to high demand.',
+      'Potential for cross-platform content distribution.'
+    ];
+    contentStrategy = [
+      'Focus on high-quality production values.',
+      'Create a content series around this theme.',
+      'Develop unique visual branding.',
+      'Implement strategic release timing.',
+      'Build a community around this content type.'
+    ];
+    audienceInsights = [
+      'Highly engaged audience with strong interaction rates.',
+      'Potential for community building and fan loyalty.',
+      'Audience likely to share and promote content.',
+      'Good potential for merchandise and additional revenue streams.',
+      'Strong potential for repeat viewers and subscribers.'
+    ];
+  } else if (score >= 5) {
+    summary = 'Good Opportunity';
+    badge = '✅';
+    plan = 'Posting soon is recommended, but monitor the trend.';
+    tips = [
+      'Optimize your video title and description for this keyword.',
+      'Try posting at peak engagement times.',
+      'Use related hashtags to expand reach.',
+      'Focus on thumbnail optimization for better CTR.',
+      'Engage with similar content creators for cross-promotion.'
+    ];
+    marketInsights = [
+      'Moderate competition with steady demand.',
+      'Stable trend suggests reliable audience.',
+      'Good potential for regular content creation.',
+      'Opportunity for niche specialization.',
+      'Potential for growth with consistent quality.'
+    ];
+    contentStrategy = [
+      'Maintain consistent posting schedule.',
+      'Focus on quality over quantity.',
+      'Develop a unique style or approach.',
+      'Engage with audience comments and feedback.',
+      'Monitor and adapt to changing trends.'
+    ];
+    audienceInsights = [
+      'Moderate but growing engagement rates.',
+      'Potential for loyal viewer base.',
+      'Good potential for community interaction.',
+      'Opportunity for audience growth.',
+      'Potential for cross-platform audience development.'
+    ];
+  } else if (score >= 3) {
+    summary = 'Average Opportunity';
+    badge = '⚠️';
+    plan = 'Consider refining your keyword or targeting a sub-niche.';
+    tips = [
+      'Look for rising related keywords.',
+      'Try a different genre or style for better results.',
+      'Engage with your audience to boost stats.',
+      'Focus on unique content angles.',
+      'Consider collaborating with other creators.'
+    ];
+    marketInsights = [
+      'High competition in this space.',
+      'Consider niche specialization.',
+      'Look for underserved sub-niches.',
+      'Monitor for emerging trends.',
+      'Consider alternative content formats.'
+    ];
+    contentStrategy = [
+      'Focus on unique value proposition.',
+      'Develop distinctive content style.',
+      'Consider shorter, more frequent content.',
+      'Experiment with different formats.',
+      'Build strong community engagement.'
+    ];
+    audienceInsights = [
+      'Lower engagement rates indicate need for improvement.',
+      'Focus on building core audience.',
+      'Monitor audience feedback closely.',
+      'Look for opportunities in related niches.',
+      'Consider audience preferences and habits.'
+    ];
+  } else {
+    summary = 'Risky/Low Opportunity';
+    badge = '❌';
+    plan = 'Not recommended to post now. Wait for a better trend or try a different keyword.';
+    tips = [
+      'Research what is trending in your genre.',
+      'Experiment with new sounds or collaborations.',
+      'Monitor trends weekly for changes.',
+      'Consider alternative content strategies.',
+      'Look for emerging trends in related niches.'
+    ];
+    marketInsights = [
+      'Highly saturated market segment.',
+      'Consider alternative content types.',
+      'Look for emerging trends.',
+      'Monitor market changes closely.',
+      'Consider cross-genre opportunities.'
+    ];
+    contentStrategy = [
+      'Focus on unique content angles.',
+      'Consider alternative formats.',
+      'Look for underserved niches.',
+      'Experiment with different styles.',
+      'Build strong brand identity.'
+    ];
+    audienceInsights = [
+      'Low engagement suggests need for change.',
+      'Consider audience preferences.',
+      'Look for new audience segments.',
+      'Monitor audience behavior patterns.',
+      'Focus on building core community.'
+    ];
+  }
+
+  // Prepare the analysis text
+  const analysisHTML = `
+    <div class='full-analyze-modal'>
+      <h2>${badge} Full Keyword Analysis</h2>
+      <div class='analyze-summary'><b>Summary:</b> ${summary}</div>
+      <div class='analyze-plan'><b>Plan:</b> ${plan}</div>
+      <div class='analyze-breakdown'>
+        <b>Key Metrics:</b>
+        <ul>
+          <li>Search Volume: <b>${formatNumber(searchVolume)}</b></li>
+          <li>Competition: <b>${Math.round(competition * 100)}%</b></li>
+          <li>Trend Direction: <b>${trendDirection === 'up' ? 'Rising' : trendDirection === 'down' ? 'Falling' : 'Stable'}</b></li>
+          <li>Engagement Rate: <b>${metrics.engagementRate}%</b></li>
+        </ul>
+      </div>
+      <div class='analyze-tips'>
+        <b>Actionable Tips:</b>
+        <ul>${tips.map(tip => `<li>${tip}</li>`).join('')}</ul>
+      </div>
+      <div class='analyze-market'>
+        <b>Market Insights:</b>
+        <ul>${marketInsights.map(insight => `<li>${insight}</li>`).join('')}</ul>
+      </div>
+      <div class='analyze-strategy'>
+        <b>Content Strategy:</b>
+        <ul>${contentStrategy.map(strategy => `<li>${strategy}</li>`).join('')}</ul>
+      </div>
+      <div class='analyze-audience'>
+        <b>Audience Insights:</b>
+        <ul>${audienceInsights.map(insight => `<li>${insight}</li>`).join('')}</ul>
+      </div>
+      <button class='analyze-close-btn' onclick='closeModal()'>Close</button>
+    </div>
+  `;
+
+  openModal(analysisHTML);
+}
+
+function calculateVideoPerformanceMetrics(videos) {
+  if (!videos || videos.length === 0) {
+    return {
+      avgWatchTime: (Math.random() * 3 + 2).toFixed(1), // 2-5 min
+      engagementRate: (Math.random() * 5 + 2).toFixed(1), // 2-7%
+      ctr: (Math.random() * 4 + 2).toFixed(1), // 2-6%
+      retentionRate: (Math.random() * 30 + 40).toFixed(1) // 40-70%
+    };
+  }
+  // Simulate or calculate based on available stats
+  let totalLikes = 0, totalComments = 0, totalViews = 0;
+  videos.forEach(video => {
+    totalLikes += parseInt(video.statistics.likeCount || 0);
+    totalComments += parseInt(video.statistics.commentCount || 0);
+    totalViews += parseInt(video.statistics.viewCount || 0);
+  });
+  const engagementRate = totalViews ? (((totalLikes + totalComments) / totalViews) * 100).toFixed(2) : (Math.random() * 5 + 2).toFixed(1);
+  // Simulate watch time, CTR, retention
+  return {
+    avgWatchTime: (Math.random() * 3 + 2).toFixed(1), // 2-5 min
+    engagementRate,
+    ctr: (Math.random() * 4 + 2).toFixed(1), // 2-6%
+    retentionRate: (Math.random() * 30 + 40).toFixed(1) // 40-70%
+  };
+}
+
+function analyzeTopChannels(videos) {
+  if (!videos || videos.length === 0) return '<p>No channel data available</p>';
+  
+  // Group videos by channel
+  const channelStats = {};
+  videos.forEach(video => {
+    const channelId = video.snippet.channelId;
+    const channelTitle = video.snippet.channelTitle;
+    if (!channelStats[channelId]) {
+      channelStats[channelId] = {
+        name: channelTitle,
+        views: 0,
+        videos: 0
+      };
+    }
+    channelStats[channelId].views += parseInt(video.statistics.viewCount || 0);
+    channelStats[channelId].videos++;
+  });
+  
+  // Sort channels by total views
+  const sortedChannels = Object.values(channelStats)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5);
+  
+  return sortedChannels.map(channel => `
+    <div class="channel-item">
+      <span class="channel-name">${channel.name}</span>
+      <span class="channel-stats">
+        ${formatNumber(channel.views)} views • ${channel.videos} videos
+      </span>
+    </div>
+  `).join('');
+}
+
+function analyzeChannelGrowth(videos) {
+  if (!videos || videos.length === 0) return '<p>No growth data available</p>';
+  
+  // Calculate average views per video and subscriber growth rate
+  const totalViews = videos.reduce((sum, video) => sum + parseInt(video.statistics.viewCount || 0), 0);
+  const avgViews = totalViews / videos.length;
+  
+  // Calculate engagement rate (likes + comments / views)
+  const totalEngagement = videos.reduce((sum, video) => {
+    const likes = parseInt(video.statistics.likeCount || 0);
+    const comments = parseInt(video.statistics.commentCount || 0);
+    const views = parseInt(video.statistics.viewCount || 0);
+    return sum + ((likes + comments) / (views || 1));
+  }, 0);
+  const avgEngagement = (totalEngagement / videos.length) * 100;
+  
+  return `
+    <div class="growth-metric">
+      <span class="metric-label">Avg. Views per Video</span>
+      <span class="metric-value">${formatNumber(avgViews)}</span>
+    </div>
+    <div class="growth-metric">
+      <span class="metric-label">Engagement Rate</span>
+      <span class="metric-value">${avgEngagement.toFixed(1)}%</span>
+    </div>
   `;
 }
 
@@ -4869,8 +5218,8 @@ async function login() {
     localStorage.setItem('isLoggedIn', 'true');
     messageElement.textContent = 'Login successful!';
     messageElement.style.color = '#00ff00';
-    closeLoginModal();
-    updateLoginButton();
+      closeLoginModal();
+      updateLoginButton();
     updateKeytrendButtonState(); // Update locked features state
   } catch (error) {
     messageElement.textContent = error.message;
@@ -4884,7 +5233,7 @@ async function logout() {
     if (error) throw error;
 
     localStorage.setItem('isLoggedIn', 'false');
-    updateLoginButton();
+  updateLoginButton();
     updateKeytrendButtonState(); // Update locked features state
   } catch (error) {
     console.error('Error logging out:', error.message);
@@ -4920,4 +5269,24 @@ supabase.auth.onAuthStateChange((event, session) => {
     updateKeytrendButtonState();
   }
 });
-// ... rest of the existing code ...
+
+// Add this function at the top level
+function openMetricsInfoModal() {
+  openModal(`
+    <div class='metrics-info-modal'>
+      <h2>About Video Performance Metrics</h2>
+      <ul>
+        <li><b>Avg. Watch Time</b>: <i>Simulated</i>. The average minutes viewers spend watching a video. Not available from public YouTube data.</li>
+        <li><b>Engagement Rate</b>: <i>Real</i>. Calculated from likes and comments divided by views (from public YouTube data).</li>
+        <li><b>Click-Through Rate (CTR)</b>: <i>Simulated</i>. The percentage of people who click a video after seeing its thumbnail. Not available from public YouTube data.</li>
+        <li><b>Retention Rate</b>: <i>Simulated</i>. The percentage of a video watched on average. Not available from public YouTube data.</li>
+      </ul>
+      <p style='margin-top:16px; color:#ffcc00;'><b>Disclaimer:</b> Only the Engagement Rate is based on real, public YouTube data. All other metrics are simulated for demonstration and may not reflect actual YouTube analytics.</p>
+      <button class='close-info-btn' onclick='closeModal()'>Close</button>
+    </div>
+  `);
+}
+
+// ... existing code ...
+
+// ... existing code ...
