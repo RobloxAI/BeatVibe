@@ -251,15 +251,23 @@ body {
   position: relative;
 }
 
-.close {
-  float: right;
-  font-size: 2em;
+.close, .close-button {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 32px;
+  font-weight: bold;
+  color: #ff0000;
+  text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
   cursor: pointer;
-  color: #ff00ff;
+  transition: all 0.3s ease;
+  z-index: 1000;
 }
 
-.close:hover {
-  color: #00ffff;
+.close:hover, .close-button:hover {
+  color: #ff3333;
+  text-shadow: 0 0 15px #ff3333, 0 0 30px #ff3333;
+  transform: scale(1.1);
 }
 
 .stars {
@@ -1944,20 +1952,88 @@ textarea {
   position: absolute;
   top: 20px;
   left: 20px;
-  background: transparent;
+  padding: 12px 25px;
+  background: linear-gradient(145deg, #1c2440, #16213e);
   border: 2px solid #00ffff;
-  color: #00ffff;
-  padding: 8px 16px;
-  border-radius: 20px;
+  color: #fff;
   cursor: pointer;
   font-size: 1em;
+  text-shadow: 0 0 5px #00ffff;
   transition: all 0.3s ease;
+  border-radius: 10px;
+  z-index: 100;
 }
 
 .login-button:hover {
-  background: #00ffff;
-  color: #000;
-  box-shadow: 0 0 20px #00ffff;
+  background: linear-gradient(145deg, #00ffff, #0099ff);
+  color: #16213e;
+  text-shadow: none;
+  transform: translateY(-2px);
+}
+
+.claim-tokens-button {
+  position: absolute;
+  top: 70px;
+  left: 20px;
+  padding: 12px 25px;
+  background: linear-gradient(145deg, #1c2440, #16213e);
+  border: 2px solid #00ff00;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1em;
+  text-shadow: 0 0 5px #00ff00;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  z-index: 100;
+}
+
+.claim-tokens-button:hover {
+  background: linear-gradient(145deg, #00ff00, #00cc00);
+  color: #16213e;
+  text-shadow: none;
+  transform: translateY(-2px);
+}
+
+.claim-tokens-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.claim-tokens-container h2 {
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
+  margin-bottom: 20px;
+}
+
+.claim-step {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.claim-step h3 {
+  color: #00ff00;
+  text-shadow: 0 0 5px #00ff00;
+  margin-bottom: 15px;
+}
+
+.user-id-display {
+  margin: 15px 0;
+}
+
+.user-id-box {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #00ffff;
+  border-radius: 5px;
+  padding: 15px;
+  margin: 10px 0;
+  font-family: monospace;
+  font-size: 1.2em;
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff;
+  word-break: break-all;
 }
 
 .login-container {

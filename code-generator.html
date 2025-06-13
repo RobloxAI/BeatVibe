@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatVibe Token Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        h1 {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #b8b8b8;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .step {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .step h2 {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #00ffff;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .btn {
+            background: linear-gradient(145deg, #1c2440, #16213e);
+            border: 2px solid #00ffff;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-shadow: 0 0 5px #00ffff;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(145deg, #00ffff, #0099ff);
+            color: #16213e;
+            text-shadow: none;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .code-display {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 1.5em;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            letter-spacing: 3px;
+            word-break: break-all;
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+
+        .info {
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+        }
+
+        .requirements {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ffff00;
+            border-radius: 8px;
+        }
+
+        .requirements h3 {
+            color: #ffff00;
+            margin-bottom: 10px;
+        }
+
+        .requirements ul {
+            margin-left: 20px;
+        }
+
+        .requirements li {
+            margin: 5px 0;
+            color: #e0e0e0;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 BeatVibe</h1>
+        <p class="subtitle">Token Code Generator</p>
+
+        <div class="requirements">
+            <h3>📋 Requirements to Get Your Code:</h3>
+            <ul>
+                <li>Follow @YourBeatStarsUsername on BeatStars</li>
+                <li>Subscribe to Your YouTube Channel</li>
+                <li>Have a valid BeatVibe User ID</li>
+                <li>Complete social media verification</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h2>Step 1: Enter Your User ID</h2>
+            <div class="input-group">
+                <label for="user-id">User ID from BeatVibe:</label>
+                <input type="text" id="user-id" placeholder="Enter your 16-character User ID" maxlength="16">
+            </div>
+            <button class="btn" onclick="validateUserID()">Validate User ID</button>
+            <div id="validation-message"></div>
+        </div>
+
+        <div class="step hidden" id="verification-step">
+            <h2>Step 2: Social Media Verification</h2>
+            <p>Please confirm you have completed the following:</p>
+            <div style="margin: 20px 0;">
+                <label>
+                    <input type="checkbox" id="beatstars-check"> I have followed on BeatStars
+                </label><br><br>
+                <label>
+                    <input type="checkbox" id="youtube-check"> I have subscribed to the YouTube channel
+                </label>
+            </div>
+            <button class="btn" onclick="generateCode()" id="generate-btn" disabled>Generate My Code</button>
+        </div>
+
+        <div class="step hidden" id="code-step">
+            <h2>🎉 Your Token Code</h2>
+            <div class="code-display" id="generated-code">CODE_HERE</div>
+            <button class="btn" onclick="copyCode()">Copy Code</button>
+            <div class="message info">
+                <strong>Instructions:</strong><br>
+                1. Copy this code<br>
+                2. Go back to BeatVibe<br>
+                3. Click "Claim Tokens"<br>
+                4. Paste your code and claim 30 tokens!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserID = '';
+        const usedUserIDs = JSON.parse(localStorage.getItem('usedUserIDs') || '[]');
+
+        function validateUserID() {
+            const userID = document.getElementById('user-id').value.trim().toUpperCase();
+            const messageDiv = document.getElementById('validation-message');
+            
+            if (!userID) {
+                showMessage(messageDiv, 'Please enter a User ID.', 'error');
+                return;
+            }
+
+            if (userID.length !== 16) {
+                showMessage(messageDiv, 'User ID must be exactly 16 characters.', 'error');
+                return;
+            }
+
+            if (!/^[A-Z0-9]+$/.test(userID)) {
+                showMessage(messageDiv, 'User ID can only contain letters and numbers.', 'error');
+                return;
+            }
+
+            // Check if this User ID has already been used
+            if (usedUserIDs.includes(userID)) {
+                showMessage(messageDiv, 'This User ID has already been used to generate a code.', 'error');
+                return;
+            }
+
+            // Validate User ID format (basic validation)
+            if (isValidUserID(userID)) {
+                currentUserID = userID;
+                showMessage(messageDiv, 'User ID validated successfully!', 'success');
+                document.getElementById('verification-step').classList.remove('hidden');
+                updateGenerateButton();
+            } else {
+                showMessage(messageDiv, 'Invalid User ID format. Please check and try again.', 'error');
+            }
+        }
+
+        function isValidUserID(userID) {
+            // Much more lenient validation for BeatVibe User IDs
+            // The User ID is generated as: btoa(email + '_' + timestamp).substring(0, 16).toUpperCase()
+            
+            // Basic checks
+            if (!userID || userID.length !== 16) {
+                return false;
+            }
+            
+            // Should only contain valid base64-like characters (uppercase letters, numbers, +, /, =)
+            if (!/^[A-Z0-9+/=]+$/.test(userID)) {
+                return false;
+            }
+            
+            // If it passes basic format checks, it's probably valid
+            // We can't easily reverse-validate the base64 since it's truncated
+            return true;
+        }
+
+        function updateGenerateButton() {
+            const beatstarsCheck = document.getElementById('beatstars-check').checked;
+            const youtubeCheck = document.getElementById('youtube-check').checked;
+            const generateBtn = document.getElementById('generate-btn');
+            
+            generateBtn.disabled = !(beatstarsCheck && youtubeCheck && currentUserID);
+        }
+
+        function generateCode() {
+            if (!currentUserID) {
+                alert('Please validate your User ID first.');
+                return;
+            }
+
+            // Generate a unique code
+            const timestamp = Date.now().toString(36).toUpperCase();
+            const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const prefix = 'BV'; // BeatVibe prefix
+            const code = prefix + timestamp.substring(0, 3) + randomPart;
+            
+            // Ensure code is exactly 8 characters
+            const finalCode = code.substring(0, 8).padEnd(8, '0');
+
+            // Mark this User ID as used
+            usedUserIDs.push(currentUserID);
+            localStorage.setItem('usedUserIDs', JSON.stringify(usedUserIDs));
+
+            // Store the generated code with timestamp
+            const generatedCodes = JSON.parse(localStorage.getItem('generatedCodes') || '[]');
+            generatedCodes.push({
+                code: finalCode,
+                userID: currentUserID,
+                timestamp: Date.now()
+            });
+            localStorage.setItem('generatedCodes', JSON.stringify(generatedCodes));
+
+            // Display the code
+            document.getElementById('generated-code').textContent = finalCode;
+            document.getElementById('code-step').classList.remove('hidden');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('generated-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard! Go back to BeatVibe to claim your tokens.');
+            });
+        }
+
+        function showMessage(element, message, type) {
+            element.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+        // Add event listeners for checkboxes
+        document.getElementById('beatstars-check').addEventListener('change', updateGenerateButton);
+        document.getElementById('youtube-check').addEventListener('change', updateGenerateButton);
+
+        // Add enter key support for User ID input
+        document.getElementById('user-id').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateUserID();
+            }
+        });
+    </script>
+</body>
+</html> 

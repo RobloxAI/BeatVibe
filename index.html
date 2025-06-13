@@ -14,6 +14,7 @@
   <div class="nebula right-nebula"></div>
   <div class="container">
     <button class="login-button" onclick="openLoginModal()">Login</button>
+    <button class="claim-tokens-button" id="claim-tokens-btn" onclick="openClaimTokensModal()" style="display: none;">Claim Tokens</button>
     <h1 class="neon-text">BeatVibe</h1>
     <p class="subtitle">Your ultimate producer toolkit.</p>
     <p class="feature-counter" id="feature-counter"></p>
@@ -282,6 +283,39 @@
             <button onclick="signup()" class="feature-button">Sign Up</button>
           </div>
           <p id="login-message" class="login-message"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="claim-tokens-modal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeClaimTokensModal()">×</span>
+        <div class="claim-tokens-container">
+          <h2>🎁 Claim Your Tokens</h2>
+          <p>Follow these steps to claim your 30 free tokens:</p>
+          
+          <div class="claim-step">
+            <h3>Step 1: Get Your User ID</h3>
+            <div class="user-id-display">
+              <p>Your User ID:</p>
+              <div class="user-id-box" id="user-id-display">Loading...</div>
+              <button onclick="copyUserID()" class="feature-button">Copy User ID</button>
+            </div>
+          </div>
+          
+          <div class="claim-step">
+            <h3>Step 2: Get Your Code</h3>
+            <p>Visit the code generator website and enter your User ID to get a one-time code.</p>
+            <button onclick="openCodeGenerator()" class="feature-button">Open Code Generator</button>
+          </div>
+          
+          <div class="claim-step">
+            <h3>Step 3: Enter Your Code</h3>
+            <input type="text" id="claim-code-input" placeholder="Enter your one-time code" class="login-input">
+            <button onclick="claimTokensWithCode()" class="feature-button">Claim 30 Tokens</button>
+          </div>
+          
+          <p id="claim-message" class="login-message"></p>
         </div>
       </div>
     </div>

@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updateVersionDisplay();
   updateFeatureCounter();
   updateKeytrendButtonState();
+  checkForTokenReward(); // Add this line
 });
 
 function updateFeatureCounter() {
@@ -3155,47 +3156,50 @@ function exportTrendAnalysis() {
 }
 
 // Cross Platform Post Formatter
-document.getElementById("cross-post-card").querySelector(".feature-button").onclick = () => {
-  openModal(`
-    <h2>Cross Platform Formatter</h2>
-    <div class="post-formatter">
-      <div class="input-section">
-        <textarea id="original-post" placeholder="Enter your post content here..." rows="4"></textarea>
-        <div class="post-options">
-          <label>Include:</label>
-          <label><input type="checkbox" id="include-hashtags" checked> Hashtags</label>
-          <label><input type="checkbox" id="include-emojis" checked> Emojis</label>
-          <label><input type="checkbox" id="include-links" checked> Links</label>
-        </div>
-      </div>
-      
-      <div class="platform-formats">
-        <div class="format-column">
-          <h3>TikTok</h3>
-          <div id="tiktok-preview" class="preview"></div>
-          <button onclick="copyFormat('tiktok')" class="copy-btn">Copy</button>
+const crossPostCard = document.getElementById("cross-post-card");
+if (crossPostCard) {
+  crossPostCard.querySelector(".feature-button").onclick = () => {
+    openModal(`
+      <h2>Cross Platform Formatter</h2>
+      <div class="post-formatter">
+        <div class="input-section">
+          <textarea id="original-post" placeholder="Enter your post content here..." rows="4"></textarea>
+          <div class="post-options">
+            <label>Include:</label>
+            <label><input type="checkbox" id="include-hashtags" checked> Hashtags</label>
+            <label><input type="checkbox" id="include-emojis" checked> Emojis</label>
+            <label><input type="checkbox" id="include-links" checked> Links</label>
+          </div>
         </div>
         
-        <div class="format-column">
-          <h3>Instagram</h3>
-          <div id="instagram-preview" class="preview"></div>
-          <button onclick="copyFormat('instagram')" class="copy-btn">Copy</button>
+        <div class="platform-formats">
+          <div class="format-column">
+            <h3>TikTok</h3>
+            <div id="tiktok-preview" class="preview"></div>
+            <button onclick="copyFormat('tiktok')" class="copy-btn">Copy</button>
+          </div>
+          
+          <div class="format-column">
+            <h3>Instagram</h3>
+            <div id="instagram-preview" class="preview"></div>
+            <button onclick="copyFormat('instagram')" class="copy-btn">Copy</button>
+          </div>
+          
+          <div class="format-column">
+            <h3>YouTube</h3>
+            <div id="youtube-preview" class="preview"></div>
+            <button onclick="copyFormat('youtube')" class="copy-btn">Copy</button>
+          </div>
         </div>
         
-        <div class="format-column">
-          <h3>YouTube</h3>
-          <div id="youtube-preview" class="preview"></div>
-          <button onclick="copyFormat('youtube')" class="copy-btn">Copy</button>
-        </div>
+        <button onclick="formatAllPlatforms()" class="format-btn">Format for All Platforms</button>
       </div>
-      
-      <button onclick="formatAllPlatforms()" class="format-btn">Format for All Platforms</button>
-    </div>
-  `);
-  
-  // Add event listener for real-time formatting
-  document.getElementById("original-post").addEventListener("input", formatAllPlatforms);
-};
+    `);
+    
+    // Add event listener for real-time formatting
+    document.getElementById("original-post").addEventListener("input", formatAllPlatforms);
+  };
+}
 
 function formatAllPlatforms() {
   const originalPost = document.getElementById("original-post").value;
@@ -5519,6 +5523,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updateVersionDisplay();
   updateFeatureCounter();
   updateKeytrendButtonState();
+  checkForTokenReward(); // Add this line
 });
 
 // Add loadTrendingKeywords function
@@ -5655,3 +5660,242 @@ displayResults = function(keyword, data) {
   }, 10);
 };
 // ... existing code ...
+
+// --- TOKEN REWARD SYSTEM FOR REKONISE INTEGRATION ---
+function awardTokens(amount) {
+  if (getIsLoggedIn()) {
+    // Logged in users have unlimited tokens, but we can still show a success message
+    showTokenRewardMessage(amount, true);
+    return true;
+  }
+  
+  let currentTokens = getUserTokens();
+  let newTokens = currentTokens + amount;
+  setUserTokens(newTokens);
+  updateTokensLabel();
+  showTokenRewardMessage(amount, false);
+  return true;
+}
+
+function showTokenRewardMessage(amount, isLoggedIn) {
+  // Create a success modal
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modal-body');
+  
+  if (!modal || !modalBody) return;
+  
+  modalBody.innerHTML = `
+    <div style="text-align: center; padding: 40px;">
+      <div style="font-size: 4em; margin-bottom: 20px;">🎉</div>
+      <h2 style="color: #00ffff; text-shadow: 0 0 10px #00ffff; margin-bottom: 20px;">
+        Congratulations!
+      </h2>
+      <p style="font-size: 1.5em; margin-bottom: 20px;">
+        ${isLoggedIn ? 
+          `Thank you for following and subscribing! You already have unlimited tokens as a logged-in user.` :
+          `You've earned ${amount} tokens for following and subscribing!`
+        }
+      </p>
+      ${!isLoggedIn ? `
+        <div style="background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; border-radius: 10px; padding: 20px; margin: 20px 0;">
+          <h3 style="color: #00ffff; margin-bottom: 10px;">Your Token Balance</h3>
+          <div style="font-size: 2em; color: #00ff00; text-shadow: 0 0 10px #00ff00;">
+            ${getUserTokens()} Tokens
+          </div>
+        </div>
+      ` : ''}
+      <p style="color: #b8b8b8; margin-bottom: 30px;">
+        Use your tokens to unlock premium features like the Trending Keyword Finder!
+      </p>
+      <button onclick="closeModal()" class="feature-button" style="font-size: 1.2em; padding: 15px 30px;">
+        Start Using BeatVibe!
+      </button>
+    </div>
+  `;
+  
+  modal.style.display = 'flex';
+  
+  // Auto-close after 10 seconds
+  setTimeout(() => {
+    closeModal();
+  }, 10000);
+}
+
+// Check URL parameters for token rewards on page load
+function checkForTokenReward() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const reward = urlParams.get('reward');
+  const tokens = urlParams.get('tokens');
+  
+  if (reward === 'social_follow' && tokens) {
+    const tokenAmount = parseInt(tokens, 10);
+    if (!isNaN(tokenAmount) && tokenAmount > 0) {
+      // Delay the reward to ensure page is fully loaded
+      setTimeout(() => {
+        awardTokens(tokenAmount);
+        // Clean up URL parameters
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+      }, 1000);
+    }
+  }
+}
+
+// Modify the existing DOMContentLoaded event listener to include token reward check
+const originalDOMContentLoadedHandler = function() {
+  checkUserLoginStatus();
+  updateVersionDisplay();
+  updateFeatureCounter();
+  updateKeytrendButtonState();
+  checkForTokenReward(); // Add this line
+};
+
+// Replace the existing event listener
+document.addEventListener('DOMContentLoaded', originalDOMContentLoadedHandler);
+
+// Also check immediately if DOM is already loaded
+if (document.readyState !== 'loading') {
+  checkForTokenReward();
+}
+// --- END TOKEN REWARD SYSTEM ---
+
+// --- CLAIM TOKENS SYSTEM ---
+function openClaimTokensModal() {
+  const modal = document.getElementById('claim-tokens-modal');
+  if (modal) {
+    modal.style.display = 'block';
+    generateUserID();
+    
+    // Hide badges and feature counter like other modals
+    document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+      badge.style.display = 'none';
+    });
+    const featureCounter = document.getElementById('feature-counter');
+    if (featureCounter) featureCounter.style.display = 'none';
+  }
+}
+
+function closeClaimTokensModal() {
+  const modal = document.getElementById('claim-tokens-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    
+    // Restore badges and feature counter
+    document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+      badge.style.display = 'flex';
+    });
+    const featureCounter = document.getElementById('feature-counter');
+    if (featureCounter) featureCounter.style.display = 'inline-block';
+  }
+}
+
+function generateUserID() {
+  // Generate a unique user ID based on their email and a timestamp
+  supabase.auth.getUser().then(({ data }) => {
+    if (data && data.user) {
+      const email = data.user.email;
+      const userID = btoa(email + '_' + Date.now()).substring(0, 16).toUpperCase();
+      document.getElementById('user-id-display').textContent = userID;
+    }
+  });
+}
+
+function copyUserID() {
+  const userIDElement = document.getElementById('user-id-display');
+  const userID = userIDElement.textContent;
+  
+  navigator.clipboard.writeText(userID).then(() => {
+    const messageElement = document.getElementById('claim-message');
+    messageElement.textContent = 'User ID copied to clipboard!';
+    messageElement.style.color = '#00ff00';
+    setTimeout(() => {
+      messageElement.textContent = '';
+    }, 3000);
+  });
+}
+
+function openCodeGenerator() {
+  // This will open the code generator website
+  window.open('https://your-code-generator-site.replit.app', '_blank');
+}
+
+function claimTokensWithCode() {
+  const code = document.getElementById('claim-code-input').value.trim();
+  const messageElement = document.getElementById('claim-message');
+  
+  if (!code) {
+    messageElement.textContent = 'Please enter a code.';
+    messageElement.style.color = '#ff4444';
+    return;
+  }
+  
+  // Validate the code format (should be 8 characters, alphanumeric)
+  if (!/^[A-Z0-9]{8}$/.test(code)) {
+    messageElement.textContent = 'Invalid code format. Code should be 8 characters.';
+    messageElement.style.color = '#ff4444';
+    return;
+  }
+  
+  // Check if code has already been used
+  const usedCodes = JSON.parse(localStorage.getItem('usedTokenCodes') || '[]');
+  if (usedCodes.includes(code)) {
+    messageElement.textContent = 'This code has already been used.';
+    messageElement.style.color = '#ff4444';
+    return;
+  }
+  
+  // Validate code with simple algorithm (you can make this more complex)
+  if (validateTokenCode(code)) {
+    // Mark code as used
+    usedCodes.push(code);
+    localStorage.setItem('usedTokenCodes', JSON.stringify(usedCodes));
+    
+    // Award tokens (30 tokens for social media follow)
+    awardTokens(30);
+    
+    messageElement.textContent = 'Success! 30 tokens have been added to your account!';
+    messageElement.style.color = '#00ff00';
+    
+    // Close modal after success
+    setTimeout(() => {
+      closeClaimTokensModal();
+    }, 2000);
+  } else {
+    messageElement.textContent = 'Invalid code. Please check your code and try again.';
+    messageElement.style.color = '#ff4444';
+  }
+}
+
+function validateTokenCode(code) {
+  // Simple validation algorithm - you can make this more sophisticated
+  // For now, we'll check if the code follows a pattern
+  const validPrefixes = ['BV', 'TK', 'SC']; // BeatVibe, Token, Social
+  const prefix = code.substring(0, 2);
+  
+  return validPrefixes.includes(prefix);
+}
+
+// Update login button visibility and show/hide claim tokens button
+function updateLoginButton() {
+  const loginButton = document.querySelector('.login-button');
+  const claimTokensButton = document.getElementById('claim-tokens-btn');
+  
+  supabase.auth.getUser().then(({ data }) => {
+    if (data && data.user) {
+      loginButton.textContent = `Logout (${data.user.email})`;
+      loginButton.onclick = logout;
+      // Show claim tokens button for logged-in users
+      if (claimTokensButton) {
+        claimTokensButton.style.display = 'block';
+      }
+    } else {
+      loginButton.textContent = 'Login';
+      loginButton.onclick = openLoginModal;
+      // Hide claim tokens button for non-logged-in users
+      if (claimTokensButton) {
+        claimTokensButton.style.display = 'none';
+      }
+    }
+  });
+}
+// --- END CLAIM TOKENS SYSTEM ---
