@@ -1,3 +1,6 @@
+// Add version variable at the top
+const version = '1.0.1';
+
 // Add this at the beginning of the file, after any existing code
 // Format large numbers properly
 function formatNumber(num) {
@@ -9,6 +12,116 @@ function formatNumber(num) {
     return num.toString();
   }
 }
+
+// Update the version display
+function updateVersionDisplay() {
+  const versionElement = document.querySelector('.version-info p');
+  if (versionElement) {
+    versionElement.textContent = `Version ${version}`;
+  }
+}
+
+// Add loadTrendingKeywords function
+function loadTrendingKeywords() {
+  const trendingList = document.getElementById('trending-list');
+  if (!trendingList) return;
+
+  // Sample trending keywords data
+  const trendingKeywords = [
+    { keyword: "type beat", volume: 1500000, trend: "up" },
+    { keyword: "trap beat", volume: 1200000, trend: "stable" },
+    { keyword: "drill beat", volume: 900000, trend: "up" },
+    { keyword: "lofi beat", volume: 800000, trend: "down" },
+    { keyword: "hip hop beat", volume: 750000, trend: "stable" }
+  ];
+
+  // Clear loading spinner
+  trendingList.innerHTML = '';
+
+  // Add each keyword to the list
+  trendingKeywords.forEach(item => {
+    const keywordElement = document.createElement('div');
+    keywordElement.className = 'trending-keyword';
+    keywordElement.innerHTML = `
+      <div class="keyword-info">
+        <div class="keyword-text">${item.keyword}</div>
+        <div class="keyword-volume">Search Volume: ${formatNumber(item.volume)}</div>
+      </div>
+      <div class="keyword-trend ${item.trend === 'up' ? 'trend-up' : item.trend === 'down' ? 'trend-down' : 'trend-stable'}">
+        ${item.trend === 'up' ? '↑' : item.trend === 'down' ? '↓' : '→'}
+      </div>
+    `;
+    trendingList.appendChild(keywordElement);
+  });
+}
+
+// Modify the showTrendingKeywords function
+function showTrendingKeywords() {
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modal-body');
+  if (!modal || !modalBody) return;
+
+  // Hide the feature counter
+  const featureCounter = document.getElementById('feature-counter');
+  if (featureCounter) featureCounter.style.display = 'none';
+
+  // Hide all recommended and maintenance badges when modal is opened
+  document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+    badge.style.display = 'none';
+  });
+
+  modalBody.innerHTML = `
+    <div class="trending-keywords-container">
+      <div class="tokens-label" id="tokens-label" style="position:absolute;top:0px;left:6px;font-size:18px;color:#00ffff;font-weight:900;z-index:2;font-family:'Orbitron','Montserrat','Segoe UI','Arial',sans-serif;letter-spacing:1px;text-shadow:0 0 8px #00ffff,0 0 16px #0ff;">Tokens: ${getIsLoggedIn() ? '∞' : getUserTokens()}</div>
+      <div class="trending-header">
+        <h2>🔥 Trending Keyword Finder</h2>
+        <p>Find trending keywords for your beats and analyze their potential.</p>
+      </div>
+      <div class="keytrend-search">
+        <input type="text" id="keyword-search" placeholder="Enter a keyword (e.g., 'trap beat', 'artist type beat')">
+        <select id="time-filter" class="time-filter">
+          <option value="all">All Time</option>
+          <option value="year">Past Year</option>
+          <option value="month">Past Month</option>
+          <option value="week">Past Week</option>
+          <option value="day">Today</option>
+        </select>
+        <button onclick="analyzeKeyword()">Analyze (−1 Token)</button>
+        <div style="font-size:13px;color:#00ffff;margin-top:4px;">This action costs <b>1 token</b>.</div>
+      </div>
+      <div id="keytrend-results" class="keytrend-results">
+        <p>Enter a keyword above to see analytics and suggestions.</p>
+      </div>
+      <div class="saved-keywords">
+        <h3>Saved Keywords</h3>
+        <div id="saved-list" class="saved-list">
+          ${renderSavedKeywords()}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-body').classList.add('keytrend-analyzer');
+  modal.style.display = 'flex';
+  setTimeout(updateTokensLabel, 10);
+}
+
+// Add token-related functions
+function checkUserLoginStatus() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const loginButton = document.querySelector('.login-button');
+  if (loginButton) {
+    loginButton.textContent = isLoggedIn ? 'Logout' : 'Login';
+  }
+}
+
+// Call this when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  checkUserLoginStatus();
+  updateVersionDisplay();
+  updateFeatureCounter();
+  updateKeytrendButtonState();
+});
+
 function updateFeatureCounter() {
   const featureCards = document.querySelectorAll('.card');
   const count = featureCards.length - 1; // Subtract 1 as requested
@@ -248,6 +361,7 @@ function openModal(content) {
       closeModal();
     }
   };
+  setTimeout(updateTokensLabel, 10);
 }
 
 function closeModal() {
@@ -260,6 +374,7 @@ function closeModal() {
   // Show the feature counter again
   const featureCounter = document.getElementById('feature-counter');
   if (featureCounter) featureCounter.style.display = '';
+  setTimeout(updateTokensLabel, 10);
 }
 
 // Search Features
@@ -1073,31 +1188,55 @@ document.getElementById("keytrend-card").querySelector(".feature-button").onclic
   openModal(`
     <h2>Trending Keyword Finder</h2>
     <p>Find trending keywords for your beats and analyze their potential.</p>
-    
-    <div class="keytrend-search">
-      <input type="text" id="keyword-search" placeholder="Enter a keyword (e.g., 'trap beat', 'artist type beat')">
-      <select id="time-filter" class="time-filter">
-        <option value="all">All Time</option>
-        <option value="year">Past Year</option>
-        <option value="month">Past Month</option>
-        <option value="week">Past Week</option>
-        <option value="day">Today</option>
-    </select>
-      <button onclick="analyzeKeyword()">Analyze</button>
+    <div class=\"keytrend-search\">
+      <input type=\"text\" id=\"keyword-search\" placeholder=\"Enter a keyword (e.g., 'trap beat', 'artist type beat')\">
+      <select id=\"time-filter\" class=\"time-filter\">
+        <option value=\"all\">All Time</option>
+        <option value=\"year\">Past Year</option>
+        <option value=\"month\">Past Month</option>
+        <option value=\"week\">Past Week</option>
+        <option value=\"day\">Today</option>
+      </select>
+      <button onclick=\"analyzeKeyword()\">Analyze</button>
     </div>
-    
-    <div id="keytrend-results" class="keytrend-results">
+    <div id=\"keytrend-results\" class=\"keytrend-results\">
       <p>Enter a keyword above to see analytics and suggestions.</p>
     </div>
-    
-    <div class="saved-keywords">
+    <div class=\"saved-keywords\">
       <h3>Saved Keywords</h3>
-      <div id="saved-list" class="saved-list">
+      <div id=\"saved-list\" class=\"saved-list\">
         ${renderSavedKeywords()}
       </div>
     </div>
   `);
-  document.getElementById('modal-body').classList.add('keytrend-analyzer');
+  // Inject the label into the modal-content for true top-left positioning
+  const modalContent = document.querySelector('.modal-content');
+  if (modalContent && !document.getElementById('tokens-label')) {
+    const label = document.createElement('span');
+    label.id = 'tokens-label';
+    label.textContent = 'Tokens:';
+    label.style.position = 'absolute';
+    label.style.top = '0px';
+    label.style.left = '6px';
+    label.style.fontSize = '18px';
+    label.style.color = '#00ffff';
+    label.style.fontWeight = '900';
+    label.style.zIndex = '10';
+    label.style.fontFamily = "'Orbitron', 'Montserrat', 'Segoe UI', 'Arial', sans-serif";
+    label.style.letterSpacing = '1px';
+    label.style.textShadow = '0 0 8px #00ffff,0 0 16px #0ff';
+    modalContent.style.position = 'relative';
+    modalContent.insertBefore(label, modalContent.firstChild);
+  }
+};
+
+// Remove the label when closing the modal
+const originalCloseModal = closeModal;
+closeModal = function() {
+  const label = document.getElementById('tokens-label');
+  if (label) label.remove();
+  originalCloseModal();
+  setTimeout(updateTokensLabel, 10);
 };
 
 function renderSavedKeywords() {
@@ -1125,6 +1264,7 @@ function saveKeyword(keyword) {
 }
 
 function analyzeKeyword(presetKeyword) {
+  if (!getIsLoggedIn() && !tryUseTokens(1)) return;
   const searchInput = presetKeyword || document.getElementById("keyword-search").value;
   
   if (!searchInput) {
@@ -1146,6 +1286,7 @@ function analyzeKeyword(presetKeyword) {
     .catch(error => {
       resultsDiv.innerHTML = `<p>Error: ${error.message}</p>`;
     });
+  updateTokensLabel();
 }
 
 // Function to fetch data from YouTube API
@@ -1414,9 +1555,10 @@ function displayResults(keyword, data) {
     
     <button onclick="saveKeyword('${keyword}')" class="feature-button">Save This Keyword</button>
     <div class="premium-analyze-section">
-      <button onclick="fullAnalyzeKeyword('${keyword}')" class="feature-button premium-analyze-btn">Full Analyze</button>
+      <button onclick="fullAnalyzeKeyword('${keyword}')" class="feature-button premium-analyze-btn">Full Analyze (−3 Tokens)</button>
     </div>
   `;
+  updateTokensLabel();
 }
 
 // Global closeModal function for all modals
@@ -1430,10 +1572,11 @@ function closeModal() {
   // Show the feature counter again
   const featureCounter = document.getElementById('feature-counter');
   if (featureCounter) featureCounter.style.display = '';
+  setTimeout(updateTokensLabel, 10);
 }
 
 function fullAnalyzeKeyword(keyword) {
-  // Show loading modal first
+  if (!getIsLoggedIn() && !tryUseTokens(3)) return;
   openModal(`
     <div class='full-analyze-modal'>
       <h2 style='color:#00eeff;'>Analyzing Keyword...</h2>
@@ -1441,18 +1584,18 @@ function fullAnalyzeKeyword(keyword) {
       <div class='analyze-loading-bar'><div class='analyze-loading-bar-inner' id='analyze-loading-bar-inner'></div></div>
     </div>
   `);
-  // Animate loading bar with longer duration
   let progress = 0;
   const bar = document.getElementById('analyze-loading-bar-inner');
   const interval = setInterval(() => {
-    progress += Math.random() * 8 + 3; // Slower progress
+    progress += Math.random() * 8 + 3;
     if (progress > 100) progress = 100;
     if (bar) bar.style.width = progress + '%';
     if (progress >= 100) {
       clearInterval(interval);
-      setTimeout(() => showFullAnalysis(keyword), 800); // Longer delay before showing results
+      setTimeout(() => showFullAnalysis(keyword), 800);
     }
-  }, 300); // Slower interval
+  }, 300);
+  updateTokensLabel();
 }
 
 function showFullAnalysis(keyword) {
@@ -1652,6 +1795,7 @@ function showFullAnalysis(keyword) {
   `;
 
   openModal(analysisHTML);
+  updateTokensLabel();
 }
 
 function calculateVideoPerformanceMetrics(videos) {
@@ -5289,4 +5433,225 @@ function openMetricsInfoModal() {
 
 // ... existing code ...
 
+// ... existing code ...
+
+// Add token state management at the top with other state variables
+let userTokens = 1; // Default tokens for non-logged in users
+
+// Update the version display
+function updateVersionDisplay() {
+  const versionElement = document.querySelector('.version-info p');
+  if (versionElement) {
+    versionElement.textContent = `Version ${version}`;
+  }
+}
+
+// Add token display function
+function updateTokenDisplay() {
+  const tokenDisplay = document.querySelector('.token-display');
+  if (tokenDisplay) {
+    tokenDisplay.textContent = `: ${userTokens}`;
+  }
+}
+
+// Modify the showTrendingKeywords function
+function showTrendingKeywords() {
+  const modal = document.getElementById('modal');
+  const modalBody = document.getElementById('modal-body');
+  if (!modal || !modalBody) return;
+
+  // Hide the feature counter
+  const featureCounter = document.getElementById('feature-counter');
+  if (featureCounter) featureCounter.style.display = 'none';
+
+  // Hide all recommended and maintenance badges when modal is opened
+  document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+    badge.style.display = 'none';
+  });
+
+  modalBody.innerHTML = `
+    <div class="trending-keywords-container">
+      <div class="tokens-label" id="tokens-label" style="position:absolute;top:0px;left:6px;font-size:18px;color:#00ffff;font-weight:900;z-index:2;font-family:'Orbitron','Montserrat','Segoe UI','Arial',sans-serif;letter-spacing:1px;text-shadow:0 0 8px #00ffff,0 0 16px #0ff;">Tokens: ${getIsLoggedIn() ? '∞' : getUserTokens()}</div>
+      <div class="trending-header">
+        <h2>🔥 Trending Keyword Finder</h2>
+        <p>Find trending keywords for your beats and analyze their potential.</p>
+      </div>
+      <div class="keytrend-search">
+        <input type="text" id="keyword-search" placeholder="Enter a keyword (e.g., 'trap beat', 'artist type beat')">
+        <select id="time-filter" class="time-filter">
+          <option value="all">All Time</option>
+          <option value="year">Past Year</option>
+          <option value="month">Past Month</option>
+          <option value="week">Past Week</option>
+          <option value="day">Today</option>
+        </select>
+        <button onclick="analyzeKeyword()">Analyze (−1 Token)</button>
+        <div style="font-size:13px;color:#00ffff;margin-top:4px;">This action costs <b>1 token</b>.</div>
+      </div>
+      <div id="keytrend-results" class="keytrend-results">
+        <p>Enter a keyword above to see analytics and suggestions.</p>
+      </div>
+      <div class="saved-keywords">
+        <h3>Saved Keywords</h3>
+        <div id="saved-list" class="saved-list">
+          ${renderSavedKeywords()}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-body').classList.add('keytrend-analyzer');
+  modal.style.display = 'flex';
+  setTimeout(updateTokensLabel, 10);
+}
+
+// Add token-related functions
+function checkUserLoginStatus() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const loginButton = document.querySelector('.login-button');
+  if (loginButton) {
+    loginButton.textContent = isLoggedIn ? 'Logout' : 'Login';
+  }
+}
+
+// Call this when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+  checkUserLoginStatus();
+  updateVersionDisplay();
+  updateFeatureCounter();
+  updateKeytrendButtonState();
+});
+
+// Add loadTrendingKeywords function
+function loadTrendingKeywords() {
+  const trendingList = document.getElementById('trending-list');
+  if (!trendingList) return;
+
+  // Sample trending keywords data
+  const trendingKeywords = [
+    { keyword: "type beat", volume: 1500000, trend: "up" },
+    { keyword: "trap beat", volume: 1200000, trend: "stable" },
+    { keyword: "drill beat", volume: 900000, trend: "up" },
+    { keyword: "lofi beat", volume: 800000, trend: "down" },
+    { keyword: "hip hop beat", volume: 750000, trend: "stable" }
+  ];
+
+  // Clear loading spinner
+  trendingList.innerHTML = '';
+
+  // Add each keyword to the list
+  trendingKeywords.forEach(item => {
+    const keywordElement = document.createElement('div');
+    keywordElement.className = 'trending-keyword';
+    keywordElement.innerHTML = `
+      <div class="keyword-info">
+        <div class="keyword-text">${item.keyword}</div>
+        <div class="keyword-volume">Search Volume: ${formatNumber(item.volume)}</div>
+      </div>
+      <div class="keyword-trend ${item.trend === 'up' ? 'trend-up' : item.trend === 'down' ? 'trend-down' : 'trend-stable'}">
+        ${item.trend === 'up' ? '↑' : item.trend === 'down' ? '↓' : '→'}
+      </div>
+    `;
+    trendingList.appendChild(keywordElement);
+  });
+}
+
+// --- TOKEN SYSTEM FOR TRENDING KEYWORD FINDER ---
+// Initialize tokens for unsigned users
+function getIsLoggedIn() {
+  if (window.supabase && supabase.auth) {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  }
+  return false;
+}
+
+function getUserTokens() {
+  if (getIsLoggedIn()) return Infinity;
+  let tokens = parseInt(localStorage.getItem('userTokens'), 10);
+  if (isNaN(tokens)) tokens = 10;
+  return tokens;
+}
+function setUserTokens(val) {
+  if (getIsLoggedIn()) return;
+  localStorage.setItem('userTokens', val);
+}
+function updateTokensLabel() {
+  const label = document.getElementById('tokens-label');
+  if (label) {
+    if (getIsLoggedIn()) {
+      label.textContent = 'Tokens: ∞';
+    } else {
+      label.textContent = 'Tokens: ' + getUserTokens();
+    }
+  }
+}
+function tryUseTokens(amount) {
+  if (getIsLoggedIn()) return true;
+  let tokens = getUserTokens();
+  if (tokens < amount) {
+    alert('You do not have enough tokens. Please sign up or log in for unlimited access!');
+    return false;
+  }
+  setUserTokens(tokens - amount);
+  updateTokensLabel();
+  return true;
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!getIsLoggedIn() && localStorage.getItem('userTokens') === null) {
+      setUserTokens(10);
+    }
+    updateTokensLabel();
+  });
+} else {
+  if (!getIsLoggedIn() && localStorage.getItem('userTokens') === null) {
+    setUserTokens(10);
+  }
+  updateTokensLabel();
+}
+// --- END TOKEN SYSTEM ---
+
+// ... existing code ...
+// --- Patch analyzeKeyword to always update tokens label after deduction and after results ---
+const originalAnalyzeKeyword = analyzeKeyword;
+analyzeKeyword = function(presetKeyword) {
+  if (!getIsLoggedIn() && !tryUseTokens(1)) return;
+  originalAnalyzeKeyword(presetKeyword);
+  setTimeout(updateTokensLabel, 10);
+};
+// Patch fullAnalyzeKeyword to always update tokens label after deduction and after results ---
+const originalFullAnalyzeKeyword = fullAnalyzeKeyword;
+fullAnalyzeKeyword = function(keyword) {
+  if (!getIsLoggedIn() && !tryUseTokens(3)) return;
+  originalFullAnalyzeKeyword(keyword);
+  setTimeout(updateTokensLabel, 10);
+};
+// --- Add token cost indicators to Analyze and Full Analyze buttons ---
+// Patch showTrendingKeywords to add cost to Analyze button
+const originalShowTrendingKeywords = showTrendingKeywords;
+showTrendingKeywords = function() {
+  originalShowTrendingKeywords();
+  setTimeout(() => {
+    updateTokensLabel();
+    // Add cost indicator to Analyze button
+    const analyzeBtn = document.querySelector('#modal-body .keytrend-search button');
+    if (analyzeBtn && !analyzeBtn.dataset.tokenCost) {
+      analyzeBtn.textContent = 'Analyze (−1 Token)';
+      analyzeBtn.dataset.tokenCost = 'shown';
+    }
+  }, 10);
+};
+// Patch displayResults to add cost to Full Analyze button
+const originalDisplayResults = displayResults;
+displayResults = function(keyword, data) {
+  originalDisplayResults(keyword, data);
+  setTimeout(() => {
+    updateTokensLabel();
+    // Add cost indicator to Full Analyze button
+    const fullBtn = document.querySelector('.premium-analyze-btn');
+    if (fullBtn && !fullBtn.dataset.tokenCost) {
+      fullBtn.textContent = 'Full Analyze (−3 Tokens)';
+      fullBtn.dataset.tokenCost = 'shown';
+    }
+  }, 10);
+};
 // ... existing code ...

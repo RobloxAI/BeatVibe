@@ -1,0 +1,144 @@
+.token-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  z-index: 10;
+}
+
+.token-icon {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(45deg, #00ffff, #0066ff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.token-display {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.trending-keywords-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  color: white;
+}
+
+.trending-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.trending-header h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.trending-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.trending-filters select {
+  padding: 8px 12px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+}
+
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trending-keyword {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.trending-keyword:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.keyword-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.keyword-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #00ffff;
+}
+
+.keyword-volume {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.keyword-trend {
+  font-size: 20px;
+}
+
+.trend-up {
+  color: #00ff00;
+}
+
+.trend-down {
+  color: #ff4444;
+}
+
+.trend-stable {
+  color: #ffcc00;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #00ffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+} 

@@ -27,7 +27,7 @@
         <span class="recommended-badge">✅ Recommended</span>
         <h2>Trending Keyword Finder</h2>
         <p>Find viral keywords and boost your beat's visibility.</p>
-        <button class="feature-button">Open</button>
+        <button class="feature-button" onclick="showTrendingKeywords()">Open</button>
         <span class="save-star" onclick="toggleSaveFeature('keytrend')">★</span>
       </div>
       <div class="card neon-border" id="bpm-tapper-card">
@@ -265,7 +265,7 @@
 
     <div id="modal" class="modal">
       <div class="modal-content">
-        <span class="close">×</span>
+        <span class="close-button" onclick="closeModal()">&times;</span>
         <div id="modal-body"></div>
       </div>
     </div>
@@ -345,7 +345,7 @@
     </div>
 
     <div class="settings-section version-info">
-      <p>Version 0.2</p>
+      <p>Version 1.0.1</p>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
