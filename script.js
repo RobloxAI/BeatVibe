@@ -72,7 +72,7 @@ function showTrendingKeywords() {
 
   modalBody.innerHTML = `
     <div class="trending-keywords-container">
-      <div class="tokens-label" id="tokens-label" style="position:absolute;top:0px;left:6px;font-size:18px;color:#00ffff;font-weight:900;z-index:2;font-family:'Orbitron','Montserrat','Segoe UI','Arial',sans-serif;letter-spacing:1px;text-shadow:0 0 8px #00ffff,0 0 16px #0ff;">Tokens: ${getIsLoggedIn() ? '∞' : getUserTokens()}</div>
+      <div class="tokens-label" id="tokens-label" style="position:absolute;top:0px;left:6px;font-size:18px;color:#00ffff;font-weight:900;z-index:2;font-family:'Orbitron','Montserrat','Segoe UI','Arial',sans-serif;letter-spacing:1px;text-shadow:0 0 8px #00ffff,0 0 16px #0ff;">Tokens: ${getUserTokens()}</div>
       <div class="trending-header">
         <h2>🔥 Trending Keyword Finder</h2>
         <p>Find trending keywords for your beats and analyze their potential.</p>
@@ -5409,10 +5409,19 @@ function loginWithProvider(provider) {
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN') {
     localStorage.setItem('isLoggedIn', 'true');
+    // Store current user data for token management
+    if (session && session.user) {
+      localStorage.setItem('currentUser', JSON.stringify({
+        email: session.user.email,
+        id: session.user.id
+      }));
+    }
     updateLoginButton();
     updateKeytrendButtonState();
   } else if (event === 'SIGNED_OUT') {
     localStorage.setItem('isLoggedIn', 'false');
+    // Clear current user data
+    localStorage.removeItem('currentUser');
     updateLoginButton();
     updateKeytrendButtonState();
   }
@@ -5440,7 +5449,7 @@ function openMetricsInfoModal() {
 // ... existing code ...
 
 // Add token state management at the top with other state variables
-let userTokens = 1; // Default tokens for non-logged in users
+// REMOVED: let userTokens = 1; // This was conflicting with the proper token system
 
 // Update the version display
 function updateVersionDisplay() {
@@ -5454,7 +5463,7 @@ function updateVersionDisplay() {
 function updateTokenDisplay() {
   const tokenDisplay = document.querySelector('.token-display');
   if (tokenDisplay) {
-    tokenDisplay.textContent = `: ${userTokens}`;
+    tokenDisplay.textContent = `: ${getUserTokens()}`;
   }
 }
 
@@ -5475,7 +5484,7 @@ function showTrendingKeywords() {
 
   modalBody.innerHTML = `
     <div class="trending-keywords-container">
-      <div class="tokens-label" id="tokens-label" style="position:absolute;top:0px;left:6px;font-size:18px;color:#00ffff;font-weight:900;z-index:2;font-family:'Orbitron','Montserrat','Segoe UI','Arial',sans-serif;letter-spacing:1px;text-shadow:0 0 8px #00ffff,0 0 16px #0ff;">Tokens: ${getIsLoggedIn() ? '∞' : getUserTokens()}</div>
+      <div class="tokens-label" id="tokens-label" style="position:absolute;top:0px;left:6px;font-size:18px;color:#00ffff;font-weight:900;z-index:2;font-family:'Orbitron','Montserrat','Segoe UI','Arial',sans-serif;letter-spacing:1px;text-shadow:0 0 8px #00ffff,0 0 16px #0ff;">Tokens: ${getUserTokens()}</div>
       <div class="trending-header">
         <h2>🔥 Trending Keyword Finder</h2>
         <p>Find trending keywords for your beats and analyze their potential.</p>
@@ -5570,30 +5579,56 @@ function getIsLoggedIn() {
 }
 
 function getUserTokens() {
-  if (getIsLoggedIn()) return Infinity;
+  if (getIsLoggedIn()) {
+    // Get current user's email to store tokens per user
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userEmail = currentUser.email;
+    
+    if (userEmail) {
+      // Store tokens per user email
+      const userTokenKey = `loggedInUserTokens_${userEmail}`;
+      let tokens = parseInt(localStorage.getItem(userTokenKey), 10);
+      if (isNaN(tokens)) {
+        tokens = 20; // Initial tokens for logged-in users
+        localStorage.setItem(userTokenKey, tokens);
+      }
+      return tokens;
+    } else {
+      return 20; // Fallback if no email found
+    }
+  }
   let tokens = parseInt(localStorage.getItem('userTokens'), 10);
   if (isNaN(tokens)) tokens = 10;
   return tokens;
 }
 function setUserTokens(val) {
-  if (getIsLoggedIn()) return;
-  localStorage.setItem('userTokens', val);
+  if (getIsLoggedIn()) {
+    // Get current user's email to store tokens per user
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const userEmail = currentUser.email;
+    
+    if (userEmail) {
+      const userTokenKey = `loggedInUserTokens_${userEmail}`;
+      localStorage.setItem(userTokenKey, val);
+    }
+  } else {
+    localStorage.setItem('userTokens', val);
+  }
 }
 function updateTokensLabel() {
   const label = document.getElementById('tokens-label');
   if (label) {
-    if (getIsLoggedIn()) {
-      label.textContent = 'Tokens: ∞';
-    } else {
-      label.textContent = 'Tokens: ' + getUserTokens();
-    }
+    label.textContent = 'Tokens: ' + getUserTokens();
   }
 }
 function tryUseTokens(amount) {
-  if (getIsLoggedIn()) return true;
   let tokens = getUserTokens();
   if (tokens < amount) {
-    alert('You do not have enough tokens. Please sign up or log in for unlimited access!');
+    if (getIsLoggedIn()) {
+      alert('You do not have enough tokens. Complete tasks to earn more tokens!');
+    } else {
+      alert('You do not have enough tokens. Please sign up or log in for more access!');
+    }
     return false;
   }
   setUserTokens(tokens - amount);
@@ -5619,14 +5654,14 @@ if (document.readyState === 'loading') {
 // --- Patch analyzeKeyword to always update tokens label after deduction and after results ---
 const originalAnalyzeKeyword = analyzeKeyword;
 analyzeKeyword = function(presetKeyword) {
-  if (!getIsLoggedIn() && !tryUseTokens(1)) return;
+  if (!tryUseTokens(1)) return;
   originalAnalyzeKeyword(presetKeyword);
   setTimeout(updateTokensLabel, 10);
 };
 // Patch fullAnalyzeKeyword to always update tokens label after deduction and after results ---
 const originalFullAnalyzeKeyword = fullAnalyzeKeyword;
 fullAnalyzeKeyword = function(keyword) {
-  if (!getIsLoggedIn() && !tryUseTokens(3)) return;
+  if (!tryUseTokens(3)) return;
   originalFullAnalyzeKeyword(keyword);
   setTimeout(updateTokensLabel, 10);
 };
@@ -5663,22 +5698,23 @@ displayResults = function(keyword, data) {
 
 // --- TOKEN REWARD SYSTEM FOR REKONISE INTEGRATION ---
 function awardTokens(amount) {
-  if (getIsLoggedIn()) {
-    // Logged in users have unlimited tokens, but we can still show a success message
-    showTokenRewardMessage(amount, true);
-    return true;
-  }
-  
   let currentTokens = getUserTokens();
   let newTokens = currentTokens + amount;
   setUserTokens(newTokens);
   updateTokensLabel();
-  showTokenRewardMessage(amount, false);
+  showTokenRewardMessage(amount, getIsLoggedIn());
   return true;
 }
 
 function showTokenRewardMessage(amount, isLoggedIn) {
-  // Create a success modal
+  // Hide badges and feature counter first
+  document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+    badge.style.display = 'none';
+  });
+  const featureCounter = document.getElementById('feature-counter');
+  if (featureCounter) featureCounter.style.display = 'none';
+  
+  // Create a success modal using the main modal system
   const modal = document.getElementById('modal');
   const modalBody = document.getElementById('modal-body');
   
@@ -5692,18 +5728,16 @@ function showTokenRewardMessage(amount, isLoggedIn) {
       </h2>
       <p style="font-size: 1.5em; margin-bottom: 20px;">
         ${isLoggedIn ? 
-          `Thank you for following and subscribing! You already have unlimited tokens as a logged-in user.` :
+          `Thank you for following and subscribing! You've earned ${amount} tokens!` :
           `You've earned ${amount} tokens for following and subscribing!`
         }
       </p>
-      ${!isLoggedIn ? `
-        <div style="background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; border-radius: 10px; padding: 20px; margin: 20px 0;">
-          <h3 style="color: #00ffff; margin-bottom: 10px;">Your Token Balance</h3>
-          <div style="font-size: 2em; color: #00ff00; text-shadow: 0 0 10px #00ff00;">
-            ${getUserTokens()} Tokens
-          </div>
+      <div style="background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff; border-radius: 10px; padding: 20px; margin: 20px 0;">
+        <h3 style="color: #00ffff; margin-bottom: 10px;">Your Token Balance</h3>
+        <div style="font-size: 2em; color: #00ff00; text-shadow: 0 0 10px #00ff00;">
+          ${getUserTokens()} Tokens
         </div>
-      ` : ''}
+      </div>
       <p style="color: #b8b8b8; margin-bottom: 30px;">
         Use your tokens to unlock premium features like the Trending Keyword Finder!
       </p>
@@ -5760,6 +5794,18 @@ if (document.readyState !== 'loading') {
 // --- END TOKEN REWARD SYSTEM ---
 
 // --- CLAIM TOKENS SYSTEM ---
+
+// Clear all stored data for testing
+function clearTokenSystemData() {
+  localStorage.removeItem('usedTokenCodes');
+  localStorage.removeItem('completedTasks');
+  localStorage.removeItem('redeemedUsers');
+  console.log('All token system data cleared for testing');
+}
+
+// Clear data on page load for testing
+clearTokenSystemData();
+
 function openClaimTokensModal() {
   const modal = document.getElementById('claim-tokens-modal');
   if (modal) {
@@ -5790,11 +5836,12 @@ function closeClaimTokensModal() {
 }
 
 function generateUserID() {
-  // Generate a unique user ID based on their email and a timestamp
+  // Generate a unique user ID based on their email only (deterministic)
   supabase.auth.getUser().then(({ data }) => {
     if (data && data.user) {
       const email = data.user.email;
-      const userID = btoa(email + '_' + Date.now()).substring(0, 16).toUpperCase();
+      // Use email only for deterministic User ID generation
+      const userID = btoa(email + '_BEATVIBE_USER').substring(0, 16).toUpperCase();
       document.getElementById('user-id-display').textContent = userID;
     }
   });
@@ -5844,35 +5891,112 @@ function claimTokensWithCode() {
     return;
   }
   
-  // Validate code with simple algorithm (you can make this more complex)
-  if (validateTokenCode(code)) {
-    // Mark code as used
-    usedCodes.push(code);
-    localStorage.setItem('usedTokenCodes', JSON.stringify(usedCodes));
-    
-    // Award tokens (30 tokens for social media follow)
-    awardTokens(30);
-    
-    messageElement.textContent = 'Success! 30 tokens have been added to your account!';
-    messageElement.style.color = '#00ff00';
-    
-    // Close modal after success
-    setTimeout(() => {
-      closeClaimTokensModal();
-    }, 2000);
-  } else {
-    messageElement.textContent = 'Invalid code. Please check your code and try again.';
-    messageElement.style.color = '#ff4444';
-  }
+  // Get current user's User ID for validation
+  supabase.auth.getUser().then(async ({ data }) => {
+    if (data && data.user) {
+      const email = data.user.email;
+      // Generate deterministic User ID (same as in generateUserID function)
+      const currentUserID = btoa(email + '_BEATVIBE_USER').substring(0, 16).toUpperCase();
+      
+      // Validate code against current user's ID
+      const isValid = await validateTokenCode(code, currentUserID);
+      
+      if (isValid) {
+        // Mark code as used
+        usedCodes.push(code);
+        localStorage.setItem('usedTokenCodes', JSON.stringify(usedCodes));
+        
+        // Mark this user as having redeemed a code
+        redeemedUsers.push(email);
+        localStorage.setItem('redeemedUsers', JSON.stringify(redeemedUsers));
+        
+        messageElement.textContent = 'Success! Closing modal and showing congratulations...';
+        messageElement.style.color = '#00ff00';
+        
+        // Close earn tokens modal first, then show congratulations after 1.5 seconds
+        setTimeout(() => {
+          closeEarnTokensModal();
+          // Award tokens and show congratulations modal after modal is closed
+          setTimeout(() => {
+            awardTokens(30);
+          }, 500);
+        }, 1500);
+      } else {
+        messageElement.textContent = 'Invalid code. This code was not generated for your account.';
+        messageElement.style.color = '#ff4444';
+      }
+    } else {
+      messageElement.textContent = 'Please log in to claim tokens.';
+      messageElement.style.color = '#ff4444';
+    }
+  });
 }
 
-function validateTokenCode(code) {
-  // Simple validation algorithm - you can make this more sophisticated
-  // For now, we'll check if the code follows a pattern
-  const validPrefixes = ['BV', 'TK', 'SC']; // BeatVibe, Token, Social
-  const prefix = code.substring(0, 2);
+// Simple hash function for code validation (matches the one in code generator)
+async function simpleHash(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
+
+async function validateTokenCode(code, userID) {
+  // Secret key for code validation (must match the one in code generator)
+  const SECRET_KEY = 'BeatVibe2024_TokenSystem_SecretKey';
   
-  return validPrefixes.includes(prefix);
+  console.log('Validating code:', code, 'for User ID:', userID);
+  
+  // Check if code has BV prefix
+  if (!code.startsWith('BV')) {
+    console.log('Code validation failed: Invalid prefix');
+    return false;
+  }
+  
+  // Extract the hash part from the code
+  const codeCore = code.substring(2); // Remove 'BV' prefix
+  console.log('Code core to validate:', codeCore);
+  
+  // Check if we have stored generation data for this code (from code generator)
+  const generatedCodes = JSON.parse(localStorage.getItem('generatedCodes') || '[]');
+  console.log('Stored generated codes:', generatedCodes);
+  
+  // First, try to find the exact code in our stored data
+  const storedCode = generatedCodes.find(gc => gc.code === code);
+  if (storedCode) {
+    console.log('Found stored code data:', storedCode);
+    // Verify the User ID matches
+    if (storedCode.userID === userID) {
+      console.log('Code validation successful: User ID matches stored data');
+      return true;
+    } else {
+      console.log('Code validation failed: User ID mismatch. Expected:', storedCode.userID, 'Got:', userID);
+      return false;
+    }
+  }
+  
+  // If not found in stored data, try the timestamp-based validation
+  console.log('Code not found in stored data, trying timestamp-based validation...');
+  
+  const now = Date.now();
+  const timeWindow = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  
+  // Check timestamps within the last 24 hours (every 10 seconds for better coverage)
+  for (let i = 0; i < timeWindow; i += 10000) { // Check every 10 seconds instead of every minute
+    const testTimestamp = now - i;
+    const codeInput = userID + SECRET_KEY + testTimestamp.toString();
+    const hash = await simpleHash(codeInput);
+    const expectedCodeCore = hash.substring(0, 6).toUpperCase();
+    
+    if (codeCore === expectedCodeCore) {
+      console.log('Code validation successful: Timestamp-based validation passed at timestamp', testTimestamp);
+      return true;
+    }
+  }
+  
+  console.log('Code validation failed: No matching timestamp found');
+  return false;
 }
 
 // Update login button visibility and show/hide claim tokens button
@@ -5899,3 +6023,286 @@ function updateLoginButton() {
   });
 }
 // --- END CLAIM TOKENS SYSTEM ---
+
+// --- EARN TOKENS SYSTEM ---
+
+// Clear all stored data for testing
+function clearTokenSystemData() {
+  localStorage.removeItem('usedTokenCodes');
+  localStorage.removeItem('completedTasks');
+  localStorage.removeItem('redeemedUsers');
+  console.log('All token system data cleared for testing');
+}
+
+// Clear data on page load for testing
+clearTokenSystemData();
+
+function openEarnTokensModal() {
+  const modal = document.getElementById('earn-tokens-modal');
+  if (modal) {
+    modal.style.display = 'block';
+    
+    // Hide badges and feature counter like other modals
+    document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+      badge.style.display = 'none';
+    });
+    const featureCounter = document.getElementById('feature-counter');
+    if (featureCounter) featureCounter.style.display = 'none';
+  }
+}
+
+function closeEarnTokensModal() {
+  const modal = document.getElementById('earn-tokens-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    
+    // Restore badges and feature counter
+    document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
+      badge.style.display = 'flex';
+    });
+    const featureCounter = document.getElementById('feature-counter');
+    if (featureCounter) featureCounter.style.display = 'inline-block';
+  }
+}
+
+function startTask() {
+  // Get user email for the task instructions
+  supabase.auth.getUser().then(({ data }) => {
+    if (data && data.user) {
+      const userEmail = data.user.email;
+      showTaskInstructions(userEmail);
+    } else {
+      alert('Please log in to start earning tokens.');
+    }
+  });
+}
+
+function showTaskInstructions(userEmail) {
+  const modal = document.getElementById('earn-tokens-modal');
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 600px;">
+      <span class="close" onclick="closeEarnTokensModal()">×</span>
+      <h2 style="color: #00ffff; text-align: center; margin-bottom: 30px;">🎯 Complete Your Task</h2>
+      
+      <div style="background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 10px; padding: 25px; margin: 20px 0;">
+        <h3 style="color: #00ff00; margin-bottom: 15px;">📋 Instructions:</h3>
+        <ol style="color: #e0e0e0; line-height: 1.8; margin-left: 20px;">
+          <li>Click the "Go to Task" button below</li>
+          <li>Complete the required actions on the task page</li>
+          <li>Take a screenshot of the completed task</li>
+          <li>Email the screenshot to <a href="mailto:thakerdubzmusic@gmail.com?subject=BeatVibe Task Completion - ${userEmail}&body=Hi, I have completed the BeatVibe token task. Please find the screenshot attached. My account email: ${userEmail}" style="color: #00ffff; text-decoration: underline;">thakerdubzmusic@gmail.com</a></li>
+          <li>You will receive a code to claim your tokens</li>
+        </ol>
+      </div>
+      
+      <div style="background: rgba(255, 255, 0, 0.1); border: 1px solid #ffff00; border-radius: 8px; padding: 15px; margin: 20px 0;">
+        <p style="color: #ffff00; margin: 0; text-align: center;">
+          <strong>⚠️ Important:</strong> Make sure to include your account email (${userEmail}) in your message!
+        </p>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="window.open('https://rekonise.com/beatvibe-token-task-ya9xj', '_blank')" class="feature-button">
+          🚀 Go to Task
+        </button>
+        <button onclick="showClaimCodeSection()" class="feature-button">
+          💎 I Have a Code
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function showClaimCodeSection() {
+  const modal = document.getElementById('earn-tokens-modal');
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close" onclick="closeEarnTokensModal()">×</span>
+      <h2 style="color: #00ffff; text-align: center; margin-bottom: 30px;">💎 Claim Your Tokens</h2>
+      
+      <div style="background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 10px; padding: 25px; margin: 20px 0;">
+        <label for="claim-code-input" style="color: #00ffff; font-weight: bold; display: block; margin-bottom: 10px;">
+          Enter your code:
+        </label>
+        <input type="text" id="claim-code-input" placeholder="Enter your code" 
+               style="width: 100%; padding: 15px; border: 2px solid #00ffff; background: rgba(0, 0, 0, 0.5); color: #fff; border-radius: 8px; font-size: 1.1em; text-align: center; font-family: monospace;">
+        
+        <button onclick="claimTokensWithCode()" class="feature-button" style="width: 100%; margin-top: 15px;">
+          🎉 Claim 30 Tokens
+        </button>
+        
+        <div id="claim-message" style="margin-top: 15px; text-align: center; font-weight: bold;"></div>
+      </div>
+      
+      <div style="text-align: center;">
+        <button onclick="startTask()" class="feature-button">
+          ← Back to Task
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function showReferralProgram() {
+  const modal = document.getElementById('earn-tokens-modal');
+  modal.innerHTML = `
+    <div class="modal-content" style="max-width: 500px;">
+      <span class="close" onclick="closeEarnTokensModal()">×</span>
+      <h2 style="color: #00ffff; text-align: center; margin-bottom: 30px;">👥 Referral Program</h2>
+      
+      <div style="background: rgba(255, 165, 0, 0.1); border: 1px solid #ffa500; border-radius: 10px; padding: 40px; text-align: center;">
+        <div style="font-size: 4em; margin-bottom: 20px;">🚧</div>
+        <h3 style="color: #ffa500; margin-bottom: 15px;">Under Maintenance</h3>
+        <p style="color: #e0e0e0; line-height: 1.6;">
+          Our referral program is currently being updated with exciting new features! 
+          Check back soon for amazing rewards when you invite friends to BeatVibe.
+        </p>
+      </div>
+      
+      <div style="text-align: center; margin-top: 30px;">
+        <button onclick="openEarnTokensModal()" class="feature-button">
+          ← Back to Earn Tokens
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Convert letters to numbers (a=1, b=2, c=3, etc.)
+function letterToNumber(letter) {
+  return letter.toLowerCase().charCodeAt(0) - 96;
+}
+
+// Generate code from email (first 3 letters + first 3 letters as numbers)
+function generateCodeFromEmail(email) {
+  const letters = email.replace(/[^a-zA-Z]/g, '').toLowerCase(); // Remove non-letters
+  if (letters.length < 3) return null;
+  
+  const firstThreeLetters = letters.substring(0, 3).toUpperCase();
+  const firstThreeNumbers = letters.substring(0, 3).split('').map(letterToNumber).join('');
+  
+  return firstThreeLetters + firstThreeNumbers;
+}
+
+function claimTokensWithCode() {
+  const code = document.getElementById('claim-code-input').value.trim().toUpperCase();
+  const messageElement = document.getElementById('claim-message');
+  
+  if (!code) {
+    messageElement.textContent = 'Please enter a code.';
+    messageElement.style.color = '#ff4444';
+    return;
+  }
+  
+  // Check if code has already been used
+  const usedCodes = JSON.parse(localStorage.getItem('usedTokenCodes') || '[]');
+  if (usedCodes.includes(code)) {
+    messageElement.textContent = 'This code has already been used.';
+    messageElement.style.color = '#ff4444';
+    return;
+  }
+  
+  // Get current user's email and validate code
+  supabase.auth.getUser().then(({ data }) => {
+    if (data && data.user) {
+      const userEmail = data.user.email;
+      
+      // Check if this user has already redeemed a code
+      const redeemedUsers = JSON.parse(localStorage.getItem('redeemedUsers') || '[]');
+      if (redeemedUsers.includes(userEmail)) {
+        messageElement.textContent = 'You have already redeemed a code. Each user can only redeem once.';
+        messageElement.style.color = '#ff4444';
+        return;
+      }
+      
+      const expectedCode = generateCodeFromEmail(userEmail);
+      
+      console.log('User email:', userEmail);
+      console.log('Expected code:', expectedCode);
+      console.log('Entered code:', code);
+      
+      if (code === expectedCode) {
+        // Mark code as used
+        usedCodes.push(code);
+        localStorage.setItem('usedTokenCodes', JSON.stringify(usedCodes));
+        
+        // Mark this user as having redeemed a code
+        redeemedUsers.push(userEmail);
+        localStorage.setItem('redeemedUsers', JSON.stringify(redeemedUsers));
+        
+        messageElement.textContent = 'Success! Closing modal and showing congratulations...';
+        messageElement.style.color = '#00ff00';
+        
+        // Close earn tokens modal first, then show congratulations after 1.5 seconds
+        setTimeout(() => {
+          closeEarnTokensModal();
+          // Award tokens and show congratulations modal after modal is closed
+          setTimeout(() => {
+            awardTokens(30);
+          }, 500);
+        }, 1500);
+      } else {
+        messageElement.textContent = 'Invalid code. Please check your code and try again.';
+        messageElement.style.color = '#ff4444';
+      }
+    } else {
+      messageElement.textContent = 'Please log in to claim tokens.';
+      messageElement.style.color = '#ff4444';
+    }
+  });
+}
+
+// Update login button visibility and show/hide earn tokens button
+function updateLoginButton() {
+  const loginButton = document.querySelector('.login-button');
+  const earnTokensButton = document.getElementById('earn-tokens-btn');
+  
+  supabase.auth.getUser().then(({ data }) => {
+    if (data && data.user) {
+      loginButton.textContent = `Logout (${data.user.email})`;
+      loginButton.onclick = logout;
+      // Show earn tokens button for logged-in users
+      if (earnTokensButton) {
+        earnTokensButton.style.display = 'block';
+      }
+    } else {
+      loginButton.textContent = 'Login';
+      loginButton.onclick = openLoginModal;
+      // Hide earn tokens button for non-logged-in users
+      if (earnTokensButton) {
+        earnTokensButton.style.display = 'none';
+      }
+    }
+  });
+}
+// --- END EARN TOKENS SYSTEM ---
+
+// Debug function to check token system (can be removed later)
+function debugTokenSystem() {
+  console.log('=== TOKEN SYSTEM DEBUG ===');
+  console.log('Is logged in:', getIsLoggedIn());
+  console.log('Current user:', localStorage.getItem('currentUser'));
+  console.log('User tokens:', getUserTokens());
+  console.log('LocalStorage userTokens:', localStorage.getItem('userTokens'));
+  console.log('LocalStorage isLoggedIn:', localStorage.getItem('isLoggedIn'));
+  
+  // Show all user-specific token keys
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (currentUser.email) {
+    const userTokenKey = `loggedInUserTokens_${currentUser.email}`;
+    console.log(`User-specific tokens (${userTokenKey}):`, localStorage.getItem(userTokenKey));
+  }
+  
+  // Test the token display
+  const tokenLabel = document.getElementById('tokens-label');
+  if (tokenLabel) {
+    console.log('Token label text:', tokenLabel.textContent);
+  }
+  
+  console.log('=== END DEBUG ===');
+}
+
+// Call debug on page load (remove this later)
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(debugTokenSystem, 1000);
+});

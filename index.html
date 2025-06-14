@@ -14,7 +14,7 @@
   <div class="nebula right-nebula"></div>
   <div class="container">
     <button class="login-button" onclick="openLoginModal()">Login</button>
-    <button class="claim-tokens-button" id="claim-tokens-btn" onclick="openClaimTokensModal()" style="display: none;">Claim Tokens</button>
+    <button class="earn-tokens-button" id="earn-tokens-btn" onclick="openEarnTokensModal()" style="display: none;">Earn Tokens</button>
     <h1 class="neon-text">BeatVibe</h1>
     <p class="subtitle">Your ultimate producer toolkit.</p>
     <p class="feature-counter" id="feature-counter"></p>
@@ -287,35 +287,27 @@
       </div>
     </div>
 
-    <div id="claim-tokens-modal" class="modal">
+    <div id="earn-tokens-modal" class="modal">
       <div class="modal-content">
-        <span class="close" onclick="closeClaimTokensModal()">×</span>
-        <div class="claim-tokens-container">
-          <h2>🎁 Claim Your Tokens</h2>
-          <p>Follow these steps to claim your 30 free tokens:</p>
+        <span class="close" onclick="closeEarnTokensModal()">×</span>
+        <div class="earn-tokens-container">
+          <h2 style="color: #00ffff; text-align: center; margin-bottom: 30px;">🎁 Earn Your Tokens</h2>
+          <p style="color: #e0e0e0; text-align: center; margin-bottom: 30px; font-size: 1.1em;">
+            There is 1 way to gain tokens and unlock premium features:
+          </p>
           
-          <div class="claim-step">
-            <h3>Step 1: Get Your User ID</h3>
-            <div class="user-id-display">
-              <p>Your User ID:</p>
-              <div class="user-id-box" id="user-id-display">Loading...</div>
-              <button onclick="copyUserID()" class="feature-button">Copy User ID</button>
+          <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <div style="background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 15px; padding: 30px; text-align: center; min-width: 250px; flex: 1; max-width: 300px;">
+              <div style="font-size: 3em; margin-bottom: 15px;">🎯</div>
+              <h3 style="color: #00ff00; margin-bottom: 15px;">Complete Tasks</h3>
+              <p style="color: #e0e0e0; margin-bottom: 20px; line-height: 1.6;">
+                Follow social media accounts and complete simple tasks to earn 30 tokens instantly!
+              </p>
+              <button onclick="startTask()" class="feature-button" style="width: 100%;">
+                🚀 Start Task
+              </button>
             </div>
           </div>
-          
-          <div class="claim-step">
-            <h3>Step 2: Get Your Code</h3>
-            <p>Visit the code generator website and enter your User ID to get a one-time code.</p>
-            <button onclick="openCodeGenerator()" class="feature-button">Open Code Generator</button>
-          </div>
-          
-          <div class="claim-step">
-            <h3>Step 3: Enter Your Code</h3>
-            <input type="text" id="claim-code-input" placeholder="Enter your one-time code" class="login-input">
-            <button onclick="claimTokensWithCode()" class="feature-button">Claim 30 Tokens</button>
-          </div>
-          
-          <p id="claim-message" class="login-message"></p>
         </div>
       </div>
     </div>

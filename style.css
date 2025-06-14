@@ -1971,6 +1971,40 @@ textarea {
   transform: translateY(-2px);
 }
 
+.earn-tokens-button {
+  position: absolute;
+  top: 70px;
+  left: 20px;
+  padding: 12px 25px;
+  background: linear-gradient(145deg, #1c2440, #16213e);
+  border: 2px solid #00ff00;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1em;
+  text-shadow: 0 0 5px #00ff00;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  z-index: 100;
+}
+
+.earn-tokens-button:hover {
+  background: linear-gradient(145deg, #00ff00, #00cc00);
+  color: #16213e;
+  text-shadow: none;
+  transform: translateY(-2px);
+}
+
+.earn-tokens-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.earn-tokens-container h2 {
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff;
+  margin-bottom: 20px;
+}
+
 .claim-tokens-button {
   position: absolute;
   top: 70px;
