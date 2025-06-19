@@ -335,7 +335,7 @@ function exportSampleList() {
     URL.revokeObjectURL(url);
 }
 
-function openModal(content) {
+function openModal(content, bodyClass = '') {
   const modal = document.getElementById('modal');
   const modalBody = document.getElementById('modal-body');
   if (!modal || !modalBody) return;
@@ -346,6 +346,8 @@ function openModal(content) {
   document.querySelectorAll('.recommended-badge, .maintenance-badge').forEach(badge => {
     badge.style.display = 'none';
   });
+  // Clear existing classes and add new one if provided
+  modalBody.className = bodyClass;
   // Set the modal content
   modalBody.innerHTML = content;
   modal.style.display = 'flex';
@@ -393,7 +395,7 @@ document.getElementById("plan-card").querySelector(".feature-button").onclick = 
   openModal(`
     <h2>Plan Your Success</h2>
     <input type="text" id="task-input" placeholder="Add a task...">
-    <button onclick="addTask()">Add Task</button>
+    <button onclick="addTask()" class="feature-button">Add Task</button>
     <ul id="task-list" style="text-align: left; font-size: 1.2em;"></ul>
   `);
   renderTasks();
@@ -441,7 +443,7 @@ document.getElementById("schedule-card").querySelector(".feature-button").onclic
     <h2>Schedule Your Drops</h2>
     <input type="text" id="event-name" placeholder="Event (e.g., Beat Drop)">
     <input type="number" id="event-day" min="1" max="31" placeholder="Day (1-31)">
-    <button onclick="addEvent()">Add</button>
+    <button onclick="addEvent()" class="feature-button">Add</button>
     <div id="calendar" class="calendar"></div>
   `);
   renderCalendar();
@@ -666,40 +668,75 @@ document.getElementById("gearhub-card").querySelector(".feature-button").onclick
   openModal(`
     <h2>Gear Hub</h2>
     <p>Your one-stop shop for production tools!</p>
-    <button onclick="openDistributionTools()">Distribution Tools</button>
+    <button onclick="openDistributionTools()" class="feature-button">Distribution Tools</button>
     <p>Explore platforms to get your music out there.</p>
-    <button onclick="openMusicGear()">Music Gear</button>
+    <button onclick="openMusicGear()" class="feature-button">Music Gear</button>
     <p>Find top-tier production equipment.</p>
-    <button onclick="openOnlineTools()">Online Tools</button>
+    <button onclick="openOnlineTools()" class="feature-button">Online Tools</button>
     <p>Boost your workflow with digital resources.</p>
   `);
 };
 
 function openDistributionTools() {
   openModal(`
-    <h2>Distribution Tools</h2>
-    <p><strong>Unchained Music</strong>: Free distribution to 200+ platforms with no upfront costs—keep 100% of your royalties while they earn through DeFi interest. Perfect for indie artists breaking free!<br>
-      <a href="https://www.unchainedmusic.io?fpr=beatvibe" target="_blank"><button>Sign Up</button></a></p>
-    <p><strong>DistroKid</strong>: Unlimited uploads for $22.99/year—fast, reliable, and artist-friendly. Use our link for a 7% discount and get on Spotify, TikTok, and more in days!<br>
-      <a href="https://distrokid.com/vip/seven/7689867" target="_blank"><button>Get 7% Off</button></a></p>
+    <h2>🚀 Distribution Tools</h2>
+    <p>Get your music out to the world with these powerful platforms!</p>
+    
+    <div style="margin: 20px 0; padding: 20px; background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 10px;">
+      <h3 style="color: #00ffff; margin-bottom: 10px;">🆓 Unchained Music</h3>
+      <p style="margin-bottom: 15px;">Free distribution to 200+ platforms with no upfront costs—keep 100% of your royalties while they earn through DeFi interest. Perfect for indie artists breaking free from traditional distribution models!</p>
+      <a href="https://www.unchainedmusic.io?fpr=beatvibe" target="_blank"><button class="feature-button">Sign Up Free</button></a>
+    </div>
+
+    <div style="margin: 20px 0; padding: 20px; background: rgba(255, 0, 255, 0.1); border: 2px solid rgba(255, 0, 255, 0.3); border-radius: 10px;">
+      <h3 style="color: #ff00ff; margin-bottom: 10px;">⚡ DistroKid</h3>
+      <p style="margin-bottom: 15px;">Unlimited uploads for $22.99/year—fast, reliable, and artist-friendly. Get on Spotify, Apple Music, TikTok, and more in just days! <strong>🎁 Use our exclusive link for a 7% discount!</strong></p>
+      <a href="https://distrokid.com/vip/seven/7689867" target="_blank"><button class="feature-button">Get 7% Off</button></a>
+    </div>
   `);
 }
 
 function openMusicGear() {
   openModal(`
-    <h2>Music Gear</h2>
+    <h2>🎛️ Music Gear</h2>
     <p>Explore must-have equipment to elevate your production game!</p>
-    <p><strong>Focusrite Scarlett 2i2</strong>: A top-tier audio interface for crystal-clear recordings.<br>
-      <a href="https://focusrite.com/en/audio-interface/scarlett" target="_blank"><button>Learn More</button></a></p>
-    <p><strong>AKAI MPC One</strong>: Standalone beat-making power for hands-on creativity.<br>
-      <a href="https://www.akaipro.com/mpc-one" target="_blank"><button>Learn More</button></a></p>
+    
+    <div style="margin: 20px 0; padding: 20px; background: rgba(255, 165, 0, 0.1); border: 2px solid rgba(255, 165, 0, 0.3); border-radius: 10px;">
+      <h3 style="color: #ffa500; margin-bottom: 10px;">🎤 Focusrite Scarlett 2i2</h3>
+      <p style="margin-bottom: 15px;">A top-tier audio interface for crystal-clear recordings. Perfect for home studios, this interface delivers professional-grade sound quality with ultra-low latency. Essential for any serious producer!</p>
+      <a href="https://focusrite.com/en/audio-interface/scarlett" target="_blank"><button class="feature-button">Learn More</button></a>
+    </div>
+
+    <div style="margin: 20px 0; padding: 20px; background: rgba(0, 255, 127, 0.1); border: 2px solid rgba(0, 255, 127, 0.3); border-radius: 10px;">
+      <h3 style="color: #00ff7f; margin-bottom: 10px;">🥁 AKAI MPC One</h3>
+      <p style="margin-bottom: 15px;">Standalone beat-making power for hands-on creativity. This legendary drum machine and sampler puts the classic MPC workflow right at your fingertips. Create beats anywhere, anytime!</p>
+      <a href="https://www.akaipro.com/mpc-one" target="_blank"><button class="feature-button">Learn More</button></a>
+    </div>
   `);
 }
 
 function openOnlineTools() {
   openModal(`
-    <h2>Online Tools</h2>
-    <p>Coming soon—digital resources to level up your production!</p>
+    <h2>🌐 Online Tools</h2>
+    <p>Digital resources to level up your production workflow!</p>
+    
+    <div style="margin: 20px 0; padding: 20px; background: rgba(0, 255, 255, 0.1); border: 2px solid rgba(0, 255, 255, 0.3); border-radius: 10px;">
+      <h3 style="color: #00ffff; margin-bottom: 10px;">🎵 Beatstars</h3>
+      <p style="margin-bottom: 15px;">The world's largest marketplace for beats and music production services. Upload, sell, and license your beats to artists worldwide. Connect with a global community of producers and artists.</p>
+      <a href="https://beatstars.com" target="_blank"><button class="feature-button">Visit Beatstars</button></a>
+    </div>
+
+    <div style="margin: 20px 0; padding: 20px; background: rgba(255, 0, 255, 0.1); border: 2px solid rgba(255, 0, 255, 0.3); border-radius: 10px;">
+      <h3 style="color: #ff00ff; margin-bottom: 10px;">🔥 Prodthaker.store</h3>
+      <p style="margin-bottom: 15px;">The best platform to buy rap/hiphop beats for under $2! Get premium quality beats at unbeatable prices. Perfect for artists looking for affordable, professional instrumentals.</p>
+      <a href="https://prodthaker.store" target="_blank"><button class="feature-button">Shop Beats</button></a>
+    </div>
+
+    <div style="margin: 20px 0; padding: 20px; background: rgba(0, 255, 0, 0.1); border: 2px solid rgba(0, 255, 0, 0.3); border-radius: 10px;">
+      <h3 style="color: #00ff00; margin-bottom: 10px;">🎧 Sample Focus</h3>
+      <p style="margin-bottom: 15px;">Discover millions of high-quality samples, loops, and one-shots from top producers. Build your sample library with royalty-free sounds across all genres. <strong>🎁 Get 10 extra credits when you sign up with our exclusive link!</strong></p>
+      <a href="https://samplefocus.com/invite/uN5unDlF" target="_blank"><button class="feature-button">Get 10 Free Credits</button></a>
+    </div>
   `);
 }
 
@@ -799,8 +836,8 @@ document.getElementById("price-card").querySelector(".feature-button").onclick =
     <input type="number" id="revenue" placeholder="Desired Revenue ($)">
     <label for="sell-rate">Sell-Through Rate: <span id="rate-value">0.5%</span></label>
     <input type="range" id="sell-rate" min="0.1" max="100" step="0.1" value="0.5" oninput="updateRate(this.value)">
-    <button onclick="calculatePrice()">Calculate</button>
-    <button onclick="showRateHelp()">How do I find my rate?</button>
+    <button onclick="calculatePrice()" class="feature-button">Calculate</button>
+    <button onclick="showRateHelp()" class="feature-button">How do I find my rate?</button>
     <p id="price-result"></p>
   `);
 };
@@ -842,7 +879,7 @@ document.getElementById("social-card").querySelector(".feature-button").onclick 
       <option value="tiktok">TikTok</option>
     </select>
     <input type="number" id="post-day" min="1" max="31" placeholder="Day (1-31)">
-    <button onclick="addPost()">Schedule Post</button>
+    <button onclick="addPost()" class="feature-button">Schedule Post</button>
     <div id="post-list" style="text-align: left; font-size: 1.2em;"></div>
   `);
   renderPosts();
@@ -896,7 +933,7 @@ document.getElementById("viral-card").querySelector(".feature-button").onclick =
       <option value="house">House</option>
     </select><br>
     <label>Hook Length (seconds):</label><input type="number" id="hook" placeholder="e.g., 15"><br>
-    <button onclick="calculateViralScore()">Calculate</button>
+    <button onclick="calculateViralScore()" class="feature-button">Calculate</button>
     <p id="viral-result"></p>
   `);
 };
@@ -939,12 +976,12 @@ document.getElementById("progress-card").querySelector(".feature-button").onclic
       <p>Progress: <span id="progress-percent">${Math.round((progressData.beatsFinished / progressData.goal) * 100)}%</span></p>
     </div>
     <input type="number" id="new-goal" placeholder="Set New Goal">
-    <button onclick="updateGoal()">Update Goal</button>
-    <button onclick="addStarted()">+1 Started</button>
-    <button onclick="addFinished()">+1 Finished</button>
-    <button onclick="subtractStarted()">-1 Started</button>
-    <button onclick="subtractFinished()">-1 Finished</button>
-    <button onclick="deleteAllProgress()">Delete All</button>
+    <button onclick="updateGoal()" class="feature-button">Update Goal</button>
+    <button onclick="addStarted()" class="feature-button">+1 Started</button>
+    <button onclick="addFinished()" class="feature-button">+1 Finished</button>
+    <button onclick="subtractStarted()" class="feature-button">-1 Started</button>
+    <button onclick="subtractFinished()" class="feature-button">-1 Finished</button>
+    <button onclick="deleteAllProgress()" class="feature-button">Delete All</button>
   `);
 };
 
@@ -1016,7 +1053,7 @@ document.getElementById("name-card").querySelector(".feature-button").onclick = 
       <option value="drill">Drill</option>
       <option value="house">House</option>
     </select>
-    <button onclick="generateName()">Generate</button>
+    <button onclick="generateName()" class="feature-button">Generate</button>
     <p id="name-result"></p>
   `);
 };
@@ -1069,7 +1106,7 @@ document.getElementById("gear-card").querySelector(".feature-button").onclick = 
     <h2>Gear Wishlist</h2>
     <input type="text" id="gear-name" placeholder="Gear (e.g., MPC One)">
     <input type="number" id="gear-cost" placeholder="Cost ($)">
-    <button onclick="addGear()">Add Gear</button>
+    <button onclick="addGear()" class="feature-button">Add Gear</button>
     <ul id="gear-list" style="text-align: left; font-size: 1.2em;"></ul>
   `);
   renderGear();
@@ -1108,8 +1145,8 @@ document.getElementById("lyric-card").querySelector(".feature-button").onclick =
   openModal(`
     <h2>Freestyle Lyric Pad</h2>
     <textarea id="lyric-text" placeholder="Drop your rhymes here...">${lyrics}</textarea>
-    <button onclick="saveLyrics()">Save</button>
-  `);
+    <button onclick="saveLyrics()" class="feature-button">Save</button>
+  `, 'lyric-pad');
 };
 
 function saveLyrics() {
@@ -1127,7 +1164,7 @@ document.getElementById("tag-card").querySelector(".feature-button").onclick = (
       <option value="chill">Chill</option>
       <option value="dark">Dark</option>
     </select>
-    <button onclick="generateTag()">Generate Tag</button>
+    <button onclick="generateTag()" class="feature-button">Generate Tag</button>
     <p id="tag-result"></p>
   `);
 };
@@ -2439,7 +2476,7 @@ document.getElementById("audio-converter-card").querySelector(".feature-button")
           <option value="medium">Medium Quality</option>
           <option value="low">Low Quality</option>
         </select>
-        <button onclick="convertAudio()">Convert</button>
+        <button onclick="convertAudio()" class="feature-button">Convert</button>
       </div>
       <div id="conversion-status"></div>
     </div>
@@ -2496,7 +2533,7 @@ document.getElementById("file-optimizer-card").querySelector(".feature-button").
           <option value="medium">Medium Quality</option>
           <option value="low">Low Quality</option>
         </select>
-        <button onclick="optimizeFile()">Optimize</button>
+        <button onclick="optimizeFile()" class="feature-button">Optimize</button>
       </div>
       <div id="optimization-status"></div>
     </div>
@@ -2842,7 +2879,7 @@ document.getElementById("contract-card").querySelector(".feature-button").onclic
             <label><input type="checkbox" id="right-broadcast"> Broadcasting</label>
           </div>
         </div>
-        <button onclick="generateContract()" class="generate-btn">Generate Contract</button>
+        <button onclick="generateContract()" class="feature-button">Generate Contract</button>
       </div>
       <div id="contract-preview" class="contract-preview"></div>
     </div>
@@ -2898,7 +2935,7 @@ function generateContract() {
   const preview = document.getElementById("contract-preview");
   preview.innerHTML = `
     <div class="contract-text">${contractText.replace(/\n/g, '<br>')}</div>
-    <button onclick="exportContract('${encodeURIComponent(contractText)}')" class="export-btn">Export Contract</button>
+    <button onclick="exportContract('${encodeURIComponent(contractText)}')" class="feature-button">Export Contract</button>
   `;
 }
 
@@ -2918,9 +2955,9 @@ document.getElementById("posttime-card").querySelector(".feature-button").onclic
     <h2>Best Posting Time Analyzer</h2>
     <div class="posttime-analyzer">
       <div class="platform-select">
-        <button onclick="analyzePlatform('youtube')" class="platform-btn">YouTube</button>
-        <button onclick="analyzePlatform('tiktok')" class="platform-btn">TikTok</button>
-        <button onclick="analyzePlatform('instagram')" class="platform-btn">Instagram</button>
+        <button onclick="analyzePlatform('youtube')" class="feature-button">YouTube</button>
+        <button onclick="analyzePlatform('tiktok')" class="feature-button">TikTok</button>
+        <button onclick="analyzePlatform('instagram')" class="feature-button">Instagram</button>
       </div>
       <div class="timezone-select">
         <label>Your Timezone:</label>
@@ -3004,7 +3041,7 @@ function analyzePlatform(platform) {
         `).join('')}
       </div>
     </div>
-    <button onclick="exportTimings('${platform}')" class="export-btn">Export Schedule</button>
+    <button onclick="exportTimings('${platform}')" class="feature-button">Export Schedule</button>
   `;
 }
 
@@ -3739,24 +3776,132 @@ function openBeatVisualizer() {
         <h2>Beat Video Visualizer</h2>
         <div class="visualizer-container">
             <div class="upload-section">
-                <input type="file" id="audio-file" accept="audio/*">
-                <button onclick="startVisualization()">Start Visualization</button>
+                <input type="file" id="audio-file" accept="audio/*" class="neon-input">
+                <button onclick="startVisualization()" class="feature-button">Start Visualization</button>
             </div>
             <div class="visualization-section">
-                <canvas id="visualizer-canvas"></canvas>
+                <canvas id="visualizer-canvas" style="width: 100%; height: 300px; background: #000; border: 2px solid #00ffff; border-radius: 10px;"></canvas>
             </div>
-            <div class="controls-section">
-                <select id="visualization-style">
+            <div class="controls-section" style="margin-top: 20px;">
+                <select id="visualization-style" class="neon-input">
                     <option value="waveform">Waveform</option>
                     <option value="frequency">Frequency Bars</option>
                     <option value="circular">Circular</option>
                     <option value="particles">Particles</option>
                 </select>
-                <button onclick="stopVisualization()">Stop</button>
+                <button onclick="stopVisualization()" class="feature-button">Stop</button>
+                <button onclick="exportVisualization()" class="feature-button">Export Video</button>
             </div>
         </div>
     `;
     openModal(modalContent);
+}
+
+let audioContext = null;
+let analyser = null;
+let dataArray = null;
+let animationId = null;
+let audioElement = null;
+let modalCheckInterval = null;
+
+function startVisualization() {
+    const fileInput = document.getElementById('audio-file');
+    const canvas = document.getElementById('visualizer-canvas');
+    
+    if (!fileInput.files[0]) {
+        alert('Please select an audio file first!');
+        return;
+    }
+
+    // Set up canvas
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Create audio context
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    // Create audio element
+    audioElement = document.createElement('audio');
+    audioElement.src = URL.createObjectURL(fileInput.files[0]);
+    audioElement.play();
+
+    // Connect audio to analyser
+    const source = audioContext.createMediaElementSource(audioElement);
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    // Start animation
+    animate();
+}
+
+function stopVisualization() {
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    if (audioElement) {
+        audioElement.pause();
+        audioElement = null;
+    }
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+    }
+    
+    // Clear canvas
+    const canvas = document.getElementById('visualizer-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+function animate() {
+    if (!analyser || !dataArray) return;
+    
+    // Check if modal is closed and stop visualization
+    const modal = document.getElementById('modal');
+    if (modal && modal.style.display === 'none') {
+        stopVisualization();
+        return;
+    }
+    
+    animationId = requestAnimationFrame(animate);
+    
+    analyser.getByteFrequencyData(dataArray);
+    
+    const canvas = document.getElementById('visualizer-canvas');
+    const ctx = canvas.getContext('2d');
+    const style = document.getElementById('visualization-style').value;
+    
+    // Clear canvas
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw visualization based on selected style
+    switch(style) {
+        case 'waveform':
+            drawWaveform(ctx, dataArray, canvas.width, canvas.height);
+            break;
+        case 'frequency':
+            drawBars(ctx, dataArray, canvas.width, canvas.height);
+            break;
+        case 'circular':
+            drawCircular(ctx, dataArray, canvas.width, canvas.height);
+            break;
+        case 'particles':
+            drawParticles(ctx, dataArray, canvas.width, canvas.height);
+            break;
+    }
+}
+
+function exportVisualization() {
+    alert('Export functionality coming soon! For now, you can screen record the visualization.');
 }
 
 function openLogoGenerator() {
