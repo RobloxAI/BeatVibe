@@ -1,3 +1,141 @@
+// Developer Mode functionality - Hide/Show developer-only features
+let developerMode = false;
+let keySequence = [];
+const devSequence = ['KeyD', 'KeyE', 'KeyV'];
+
+// Function to enable developer mode
+function enableDeveloperMode() {
+  developerMode = true;
+  document.body.classList.add('developer-mode');
+  console.log('🔧 Developer mode enabled - Hidden features are now visible');
+  
+  // Show notification
+  showDevNotification('Developer mode enabled', 'success');
+  
+  // Store in sessionStorage so it persists during the session
+  sessionStorage.setItem('developerMode', 'true');
+}
+
+// Function to disable developer mode
+function disableDeveloperMode() {
+  developerMode = false;
+  document.body.classList.remove('developer-mode');
+  console.log('🔧 Developer mode disabled - Hidden features are now hidden');
+  
+  // Show notification
+  showDevNotification('Developer mode disabled', 'info');
+  
+  // Remove from sessionStorage
+  sessionStorage.removeItem('developerMode');
+}
+
+// Function to toggle developer mode
+function toggleDeveloperMode() {
+  if (developerMode) {
+    disableDeveloperMode();
+  } else {
+    enableDeveloperMode();
+  }
+}
+
+// Function to show developer notifications
+function showDevNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `dev-notification ${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? 'rgba(0, 255, 0, 0.9)' : 'rgba(0, 255, 255, 0.9)'};
+    color: #000;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 10000;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+  }, 3000);
+}
+
+// Listen for keyboard events to enable developer mode
+document.addEventListener('keydown', function(event) {
+  // Add key to sequence
+  keySequence.push(event.code);
+  
+  // Keep only the last 3 keys
+  if (keySequence.length > 3) {
+    keySequence.shift();
+  }
+  
+  // Check if sequence matches DEV
+  if (JSON.stringify(keySequence) === JSON.stringify(devSequence)) {
+    toggleDeveloperMode();
+    keySequence = []; // Reset sequence
+  }
+  
+  // Alternative: Ctrl+Shift+D for developer mode
+  if (event.ctrlKey && event.shiftKey && event.code === 'KeyD') {
+    event.preventDefault();
+    toggleDeveloperMode();
+  }
+});
+
+// Check for developer mode URL parameter and sessionStorage on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('dev') === 'true' || urlParams.get('developer') === 'true') {
+    enableDeveloperMode();
+  } else if (sessionStorage.getItem('developerMode') === 'true') {
+    enableDeveloperMode();
+  }
+});
+
+// Add developer console commands for easy access
+window.devMode = {
+  enable: enableDeveloperMode,
+  disable: disableDeveloperMode,
+  toggle: toggleDeveloperMode,
+  status: () => developerMode,
+  help: () => {
+    console.log(`
+🔧 BeatVibe Developer Mode Commands:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 BASIC COMMANDS:
+- devMode.enable() - Enable developer mode
+- devMode.disable() - Disable developer mode  
+- devMode.toggle() - Toggle developer mode
+- devMode.status() - Check if developer mode is active
+
+🎛️ ACCESS METHODS:
+- Type "DEV" quickly on keyboard
+- Ctrl+Shift+D keyboard shortcut
+- Add ?dev=true to URL
+- Console: devMode.enable()
+
+🔒 HIDDEN FEATURES AVAILABLE:
+- Trending Sound Analyzer (Card visible when dev mode active)
+- Beat Performance Tracker (Card visible when dev mode active)
+- Collaboration Matcher (Card visible when dev mode active)
+- Other developer-only features marked with 🔧 DEV badge
+
+💡 TIP: Once enabled, developer mode persists during your session.
+Hidden features will be visible as cards when dev mode is active.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `);
+  }
+};
+
 // Add version variable at the top
 const version = '1.0.1';
 
@@ -124,8 +262,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateFeatureCounter() {
+  // Count all feature cards (both visible and hidden developer features)
   const featureCards = document.querySelectorAll('.card');
-  const count = featureCards.length - 1; // Subtract 1 as requested
+  const count = featureCards.length;
   const counterElement = document.getElementById('feature-counter');
   counterElement.textContent = `${count}+ amazing features!`;
 }

@@ -215,7 +215,7 @@
         <span class="save-star" onclick="toggleSaveFeature('producer-dictionary')">★</span>
       </div>
 
-      <div class="card neon-border" id="trending-sound-card">
+      <div class="card neon-border developer-hidden" id="trending-sound-card">
         <h2>Trending Sound Analyzer</h2>
         <p>Analyze trending sounds on social media.</p>
         <p class="feature-description">🔒 Login to unlock this powerful feature and analyze trending sounds!</p>
@@ -224,7 +224,7 @@
         <span class="save-star" onclick="toggleSaveFeature('trending-sound')">★</span>
       </div>
 
-      <div class="card neon-border" id="beat-performance-card">
+      <div class="card neon-border developer-hidden" id="beat-performance-card">
         <h2>Beat Performance Tracker</h2>
         <p>Track and analyze your beat's performance metrics.</p>
         <p class="feature-description">🔒 Login to unlock this powerful feature and track your beat's performance!</p>
@@ -237,12 +237,12 @@
         <h2>Release Impact Analyzer</h2>
         <p>Analyze the potential impact of your music release.</p>
         <p class="feature-description">🔒 Login to unlock this powerful feature and analyze your release impact!</p>
-        <button class="feature-button" disabled>Open</button>
+        <button class="feature-button" disabled onclick="openReleaseImpact()">Open</button>
         <span class="lock-icon">🔒</span>
         <span class="save-star" onclick="toggleSaveFeature('release-impact')">★</span>
       </div>
 
-      <div class="card neon-border" id="collab-matcher-card">
+      <div class="card neon-border developer-hidden" id="collab-matcher-card">
         <h2>Collaboration Matcher</h2>
         <p>Find perfect collaborators for your projects.</p>
         <p class="feature-description">🔒 Login to unlock this powerful feature and find amazing collaborators!</p>
@@ -256,7 +256,7 @@
         <h2>YouTube Upload Assistant</h2>
         <p>Generate titles, descriptions, tags, and a checklist for uploading your beats to YouTube.</p>
         <p class="feature-description">🔒 Login to unlock this powerful feature and optimize your YouTube uploads!</p>
-        <button class="feature-button" disabled>Open</button>
+        <button class="feature-button" disabled onclick="openYouTubeUploadAssistant()">Open</button>
         <span class="lock-icon">🔒</span>
         <span class="save-star" onclick="toggleSaveFeature('youtube-upload-assistant')">★</span>
       </div>
