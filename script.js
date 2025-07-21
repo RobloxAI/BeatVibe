@@ -2,6 +2,7 @@
 let developerMode = false;
 let keySequence = [];
 const devSequence = ['KeyD', 'KeyE', 'KeyV'];
+let lastKeywordModalContent = null;
 
 // Function to enable developer mode
 function enableDeveloperMode() {
@@ -262,8 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateFeatureCounter() {
-  // Count all feature cards (both visible and hidden developer features)
-  const featureCards = document.querySelectorAll('.card');
+  // Count only the feature cards that are not developer-hidden
+  const featureCards = document.querySelectorAll('.card:not(.developer-hidden)');
   const count = featureCards.length;
   const counterElement = document.getElementById('feature-counter');
   counterElement.textContent = `${count}+ amazing features!`;
@@ -558,7 +559,7 @@ function renderTasks() {
     li.innerHTML = `
       <input type="checkbox" ${task.checked ? "checked" : ""} onchange="toggleTask(${index})">
       ${task.text}
-      ${task.checked ? `<span class="remove-btn" onclick="removeTask(${index})">×</span>` : ""}
+      <span class="remove-btn" onclick="removeTask(${index})">×</span>
     `;
     taskList.appendChild(li);
   });
@@ -884,54 +885,7 @@ document.getElementById("beatshop-card").querySelector(".feature-button").onclic
   openModal(`
     <h2>Premium Beats Shop</h2>
     <div class="beatshop-container">
-      <div class="beatshop-header">
-        <h3>🎵 Featured Beats</h3>
-        <p>Limited Time Offer - All Beats Under $1!</p>
-      </div>
-      
-      <div class="beat-grid">
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track?id=21927529" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track?id=22156621" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track?id=22156676" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track?id=22613621" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track?id=22622539" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track/?id=21825466" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track/?id=21786538" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track/?id=21668796" width="100%" height="156"></iframe>
-        </div>
-        <div class="beat-item">
-          <iframe src="https://www.beatstars.com/embed/track/?id=21528961" width="100%" height="156"></iframe>
-        </div>
-      </div>
-
-      <div class="beatshop-footer">
-        <p>🎧 All beats include:</p>
-        <ul>
-          <li>✓ Untagged WAV file</li>
-          <li>✓ Instant delivery</li>
-          <li>✓ Basic lease rights</li>
-          <li>✓ Commercial use allowed</li>
-        </ul>
-        <div class="sale-banner">
-          <span class="sale-text">TODAY'S SPECIAL OFFER</span>
-          <span class="timer" id="sale-timer">Ends at midnight: 23:59:59</span>
-        </div>
-      </div>
+        <iframe src="https://player.beatstars.com/?storeId=150668" width="100%" height="1024" style="max-width:2050px;"> -- none -- </iframe>
     </div>
   `);
   document.getElementById('modal-body').classList.add('beatshop');
@@ -1752,8 +1706,23 @@ function closeModal() {
   setTimeout(updateTokensLabel, 10);
 }
 
+function restorePreviousModal() {
+  const modalBody = document.getElementById('modal-body');
+  if (modalBody && lastKeywordModalContent) {
+    modalBody.innerHTML = lastKeywordModalContent;
+    modalBody.className = 'keytrend-analyzer';
+    updateTokensLabel();
+  } else {
+    closeModal(); // Fallback in case content is missing
+  }
+}
+
 function fullAnalyzeKeyword(keyword) {
   if (!getIsLoggedIn() && !tryUseTokens(3)) return;
+  const modalBody = document.getElementById('modal-body');
+  if (modalBody) {
+    lastKeywordModalContent = modalBody.innerHTML;
+  }
   openModal(`
     <div class='full-analyze-modal'>
       <h2 style='color:#00eeff;'>Analyzing Keyword...</h2>
@@ -1967,7 +1936,7 @@ function showFullAnalysis(keyword) {
         <b>Audience Insights:</b>
         <ul>${audienceInsights.map(insight => `<li>${insight}</li>`).join('')}</ul>
       </div>
-      <button class='analyze-close-btn' onclick='closeModal()'>Close</button>
+      <button class='analyze-close-btn' onclick='restorePreviousModal()'>Close</button>
     </div>
   `;
 
@@ -2494,45 +2463,119 @@ function generateDrumPattern() {
   const style = document.getElementById("drum-style").value;
   const complexity = document.getElementById("pattern-complexity").value;
   
-  const patterns = {
-    trap: {
-      simple: {
-        kick:   "K---K---K---K---",
-        snare:  "----S-------S---",
-        hihat:  "H-H-H-H-H-H-H-H-"
-      },
-      medium: {
-        kick:   "K--KK--K-K--K---",
-        snare:  "----S-------S-S-",
-        hihat:  "H-HHH-H-H-HHH-H-"
-      },
-      complex: {
-        kick:   "K-KKK--KK-K-K-K-",
-        snare:  "----S--S----S-S-",
-        hihat:  "HHHHHHHHHHHHHHHH"
-      }
-    },
-    hiphop: {
-      simple: {
-        kick:   "K---K---K---K---",
-        snare:  "----S-------S---",
-        hihat:  "H-H-H-H-H-H-H-H-"
-      },
-      medium: {
-        kick:   "K---K-K-K---K-K-",
-        snare:  "----S-------S---",
-        hihat:  "H-H-HHH-H-H-HHH-"
-      },
-      complex: {
-        kick:   "K-K-K-KKK---K-K-",
-        snare:  "----S--S----S-S-",
-        hihat:  "HHHHHHHHHHHHHHHH"
-      }
+  const generateRandomizedPattern = (style, complexity) => {
+    let kick = Array(16).fill('-');
+    let snare = Array(16).fill('-');
+    let hihat = Array(16).fill('-');
+
+    const setKick = (positions) => positions.forEach(p => { if(p >= 0 && p < 16) kick[p] = 'K'});
+    const setSnare = (positions) => positions.forEach(p => { if(p >= 0 && p < 16) snare[p] = 'S'});
+    const setHihat = (positions) => positions.forEach(p => { if(p >= 0 && p < 16) hihat[p] = 'H'});
+
+    const backbeat = [4, 12];
+
+    if (style === 'house') {
+        setKick([0, 4, 8, 12]);
+        setSnare(backbeat);
+        
+        let hatPattern = [];
+        if (complexity === 'simple') {
+            for (let i = 2; i < 16; i += 4) hatPattern.push(i);
+        } else if (complexity === 'medium') {
+             for (let i = 0; i < 16; i += 2) hatPattern.push(i);
+        } else {
+            for (let i = 0; i < 16; i++) {
+                if (Math.random() > 0.2) hatPattern.push(i);
+            }
+        }
+        setHihat(hatPattern);
+
+    } else if (style === 'trap') {
+        setSnare([8]);
+        if (Math.random() > 0.5) snare[Math.random() > 0.5 ? 14 : 15] = 'S';
+
+        let kickPattern = [0];
+        let kickCount = complexity === 'simple' ? 2 : (complexity === 'medium' ? 3 : 5);
+        for(let i = 0; i < kickCount; i++) {
+            const randomPos = Math.floor(Math.random() * 16);
+            if (!kickPattern.includes(randomPos)) kickPattern.push(randomPos);
+        }
+        setKick(kickPattern.sort((a,b)=>a-b));
+
+        let hatPattern = [];
+        const hatRate = complexity === 'simple' ? 2 : 1;
+        for (let i = 0; i < 16; i+= hatRate) {
+            hatPattern.push(i);
+        }
+
+        if (complexity !== 'simple') {
+            const rollCount = complexity === 'medium' ? Math.floor(Math.random() * 2) + 1 : Math.floor(Math.random() * 3) + 2;
+            for (let i=0; i < rollCount; i++) {
+                const rollStart = Math.floor(Math.random() * 14);
+                if(hatPattern.includes(rollStart)) {
+                    if(!hatPattern.includes(rollStart+1)) hatPattern.push(rollStart+1);
+                    if(Math.random() > 0.5 && !hatPattern.includes(rollStart+2)) hatPattern.push(rollStart+2);
+                }
+            }
+        }
+        setHihat(hatPattern);
+
+    } else if (style === 'hiphop') {
+        setSnare(backbeat);
+
+        let kickPattern = [0];
+        const kickCount = complexity === 'simple' ? 2 : (complexity === 'medium' ? 3 : 4);
+        const commonKickPos = [3, 6, 7, 10, 11, 15];
+        for (let i = 0; i < kickCount; i++) {
+             const randomPos = commonKickPos[Math.floor(Math.random() * commonKickPos.length)];
+             if (!kickPattern.includes(randomPos)) kickPattern.push(randomPos);
+        }
+        setKick(kickPattern);
+
+        let hatPattern = [];
+        if (complexity === 'simple') {
+            for (let i = 0; i < 16; i+=2) hatPattern.push(i);
+        } else {
+            for(let i=0; i<16; i++) {
+                const prob = (i % 2 === 0) ? 0.9 : 0.4;
+                if (Math.random() < prob) hatPattern.push(i);
+            }
+        }
+        setHihat(hatPattern);
+
+    } else if (style === 'rnb') {
+        setSnare(backbeat);
+         if (Math.random() > 0.6) {
+            const ghostPos = [6, 7, 10, 14, 15];
+            snare[ghostPos[Math.floor(Math.random() * ghostPos.length)]] = 'S';
+        }
+
+        let kickPattern = [0];
+        const kickCount = complexity === 'simple' ? 1 : (complexity === 'medium' ? 2 : 3);
+        const commonKickPos = [3, 6, 7, 10, 11, 14, 15];
+         for (let i = 0; i < kickCount; i++) {
+             const randomPos = commonKickPos[Math.floor(Math.random() * commonKickPos.length)];
+             if (!kickPattern.includes(randomPos)) kickPattern.push(randomPos);
+        }
+        setKick(kickPattern);
+        
+        let hatPattern = [];
+        for(let i=0; i<16; i++) {
+            const prob = complexity === 'simple' ? 0.4 : (complexity === 'medium' ? 0.6 : 0.8);
+            if (Math.random() < prob) hatPattern.push(i);
+        }
+        setHihat(hatPattern);
     }
-  };
+
+    return {
+        kick: kick.join(''),
+        snare: snare.join(''),
+        hihat: hihat.join('')
+    };
+  }
   
   const result = document.getElementById("drum-result");
-  const pattern = patterns[style][complexity];
+  const pattern = generateRandomizedPattern(style, complexity);
   
   result.innerHTML = `
     <div class="drum-grid">
@@ -5934,8 +5977,7 @@ if (document.readyState === 'loading') {
 }
 // --- END TOKEN SYSTEM ---
 
-// ... existing code ...
-// --- Patch analyzeKeyword to always update tokens label after deduction and after results ---
+// --- PATCH analyzeKeyword to always update tokens label after deduction and after results ---
 const originalAnalyzeKeyword = analyzeKeyword;
 analyzeKeyword = function(presetKeyword) {
   if (!tryUseTokens(1)) return;

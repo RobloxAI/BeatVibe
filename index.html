@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BeatVibe - Your Producer Hub</title>
+  <link rel="icon" type="image/png" href="Copy of BV.png">
   <link rel="stylesheet" href="style.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3734597308709750" crossorigin="anonymous"></script>
 </head>
@@ -126,9 +127,10 @@
       </div>
       
       <div class="card neon-border" id="file-optimizer-card">
-        <h2>File Optimizer</h2>
-        <p>Optimize file sizes.</p>
-        <button class="feature-button">Open</button>
+        <span class="beta-tag" onclick="showBetaInfo()">Beta</span>
+        <h2>File Size Optimizer</h2>
+        <p>Reduce file sizes without losing quality.</p>
+        <button class="feature-button">Optimize Now</button>
         <span class="save-star" onclick="toggleSaveFeature('file-optimizer')">★</span>
       </div>
       
@@ -377,6 +379,18 @@
     const SUPABASE_URL = 'https://uzrqmkmbdpibgejbwilt.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6cnFta21iZHBpYmdlamJ3aWx0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4MDI0NjgsImV4cCI6MjA2MzM3ODQ2OH0.eHjzgwkrD0RJqP2_cA_p58Ls0bTLu6_UEEPtscvmuWc';
     window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+  <script>
+    function showBetaInfo() {
+      openModal(`
+        <div class="beta-info-modal">
+          <h2>🚀 Beta Feature Notice</h2>
+          <p>This feature is new and still in active development. We're working hard to improve it, but you may encounter some quirks or frequent errors.</p>
+          <p>Your feedback is invaluable! Please report any issues or suggestions to help us make this feature better.</p>
+          <button class="feature-button" onclick="closeModal()">Got It</button>
+        </div>
+      `);
+    }
   </script>
   <script src="script.js"></script>
 </body>
